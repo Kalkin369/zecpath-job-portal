@@ -7,8 +7,8 @@ from core.views.auth_views import SignupAPI,LoginAPI
 
 router = DefaultRouter()
 router.register('users', UserViewSet)
-router.register('employers', EmployerViewSet)
-router.register('candidates', CandidateViewSet)
+router.register('employers', EmployerViewSet,basename='employer')
+router.register('candidates', CandidateViewSet,basename='candidate')
 router.register('jobs', JobViewSet)
 router.register('applications', ApplicationViewSet)
 

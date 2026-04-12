@@ -4,6 +4,8 @@ from django.conf import settings
 class Employer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     company_name = models.CharField(max_length=200)
+    domain = models.CharField(max_length=100,blank=True)
+    company_size = models.CharField(max_length=50,blank=True)
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):

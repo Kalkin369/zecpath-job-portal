@@ -1,10 +1,10 @@
-from rest_framework import viewsets
+from core.views.base_viewset import BaseViewSet
 from core.models.candidate import Candidate
 from core.serializers.candidate_serializer import CandidateSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
-class CandidateViewSet(viewsets.ModelViewSet):
+class CandidateViewSet(BaseViewSet):
     queryset = Candidate.objects.all()
     serializer_class = CandidateSerializer
     permission_classes = [IsAuthenticated]

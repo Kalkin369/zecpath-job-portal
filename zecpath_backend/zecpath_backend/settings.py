@@ -135,12 +135,14 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# DRF Auth
+# DRF Auth and Centralized Error Handling
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+
+    'EXCEPTION_HANDLER':'core.utils.exception_handler.custom_exception_handler'
 }
 
 # Configure Media

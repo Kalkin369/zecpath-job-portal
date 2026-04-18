@@ -1,10 +1,10 @@
-from rest_framework import viewsets
+from core.views.base_viewset import BaseViewSet
 from core.models.employer import Employer
 from core.serializers.employer_serializer import EmployerSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
-class EmployerViewSet(viewsets.ModelViewSet):
+class EmployerViewSet(BaseViewSet):
     queryset = Employer.objects.all()
     serializer_class = EmployerSerializer
     permission_classes = [IsAuthenticated]

@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from core.views.base_viewset import BaseViewSet
 from core.models.application import Application
 from core.serializers.application_serializer import ApplicationSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -7,7 +7,7 @@ from core.permissions import IsCandidate
 
 
 
-class ApplicationViewSet(viewsets.ModelViewSet):
+class ApplicationViewSet(BaseViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
 

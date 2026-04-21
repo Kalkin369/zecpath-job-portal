@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'core.apps.CoreConfig',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -142,8 +143,13 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 
-    'EXCEPTION_HANDLER':'core.utils.exception_handler.custom_exception_handler'
-}
+    'EXCEPTION_HANDLER':'core.utils.exception_handler.custom_exception_handler',
+
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination','PAGE_SIZE':5,
+
+    'DEFAULT_FILTER_BACKENDS':['django_filters.rest_framework.DjangoFilterBackend'],
+}                             
+
 
 # Configure Media
 MEDIA_URL = '/media/'

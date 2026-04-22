@@ -17,7 +17,8 @@ class SignupAPI(APIView):
     
 
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
+from core.services.auth_service import generate_tokens
+from core.utils.response import success_response
 
 
 class LoginAPI(APIView):
@@ -30,9 +31,6 @@ class LoginAPI(APIView):
         if user is None:
             return Response({"error": "Invalid credentials"}, status=401)
 
-        refresh = RefreshToken.for_user(user)
+        tokens = generate_tokens(user)
 
-        return Response({
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-        })    
+        return success_response(tokens, "Login successful")

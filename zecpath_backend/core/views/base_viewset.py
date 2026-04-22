@@ -13,7 +13,7 @@ class BaseViewSet(ModelViewSet):
     
     def create(self,request,*args,**kwargs):
         response =super().create(request,*args,**kwargs)
-        return success_response(response.data,message="Created Successfully")
+        return success_response(response.data,message="Created Successfully",status_code=201)
     
     def update(self,request,*args,**kwargs):
         response = super().update(request,*args,**kwargs)

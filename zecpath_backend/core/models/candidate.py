@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from ..validators import validate_resume
-
+import os
 
 def resume_upload_path(instance,filename):
     return f"resumes/user_{instance.user.id}/{filename}"
@@ -17,3 +17,13 @@ class Candidate(models.Model):
 
     def __str__(self):
         return self.user.email
+    
+    def save(self,*args,**kwargs):
+        try:
+            old = Candidate.objects.get(pk=self.pk)
+            if old.resume and old.resume != self.resume:
+                if os.path.isfile(old.resume.path):
+                   os.remove(old.resume.path)
+        except Candidate.DoesNotExist:
+            pass
+        super().save(*args,**kwargs)           

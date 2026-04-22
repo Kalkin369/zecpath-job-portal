@@ -9,6 +9,7 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 class JobViewSet(BaseViewSet):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
+    permission_classes = [IsAuthenticated,]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_fields = ['experience_required','employer']
     search_fields = ['title','description','required_skills']

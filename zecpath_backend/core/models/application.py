@@ -18,3 +18,5 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate} - {self.job}"
+    
+    

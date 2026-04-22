@@ -12,6 +12,7 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 class ApplicationViewSet(BaseViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
+    permission_classes = [IsAuthenticated,]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_fields = ['status']
     search_fields = ['job','title']

@@ -31,9 +31,9 @@ class ApplicationInline(admin.TabularInline):
 
 #  Job Admin
 class JobAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'employer', 'experience_required', 'created_at')
-    search_fields = ('title', 'required_skills')
-    list_filter = ('experience_required',)
+    list_display = ('id', 'title', 'employer', 'experience','status', 'created_at')
+    search_fields = ('title', 'skills')
+    list_filter = ('status','job_type')
     ordering = ('-created_at',)
     inlines = [ApplicationInline]
 

@@ -2,12 +2,35 @@ from django.db import models
 from .employer import Employer
 
 class Job(models.Model):
-    title = models.CharField(max_length=200)
+
+    JOB_TYPE_CHOICES = (
+        ('full_time', 'Full Time'),
+        ('part_time', 'Part Time'),
+        ('internship', 'Internship'),
+    )
+
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    )
+
+    employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
+
+    title = models.CharField(max_length=255)
     description = models.TextField()
-    required_skills = models.CharField(max_length=200)
-    employer = models.ForeignKey(Employer,on_delete=models.CASCADE,null=True,blank=True)
-    experience_required = models.IntegerField(default=0)
+    skills = models.TextField()
+
+    experience = models.IntegerField(default=0)
+    salary_min = models.IntegerField(null=True, blank=True)
+    salary_max = models.IntegerField(null=True, blank=True)
+
+    location = models.CharField(max_length=255)
+    job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title

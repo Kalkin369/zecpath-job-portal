@@ -2,9 +2,7 @@ from django.db import models
 from django.conf import settings
 from ..validators import validate_resume
 import os
-
-def resume_upload_path(instance,filename):
-    return f"resumes/user_{instance.user.id}/{filename}"
+from core.utils.file_upload import resume_upload_path
 
 class Candidate(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)

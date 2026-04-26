@@ -39,10 +39,10 @@ class JobAdmin(admin.ModelAdmin):
 
 #  Application Admin
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'candidate', 'job', 'status', 'ats_score', 'created_at')
+    list_display = ('id', 'candidate', 'job', 'status', 'ats_score', 'applied_at')
     search_fields = ('candidate__user__email', 'job__title')
     list_filter = ('status',)
-    ordering = ('-created_at',)
+    ordering = ('-applied_at',)
 
 
 #  Register

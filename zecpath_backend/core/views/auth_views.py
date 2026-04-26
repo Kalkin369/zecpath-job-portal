@@ -34,3 +34,37 @@ class LoginAPI(APIView):
         tokens = generate_tokens(user)
 
         return success_response(tokens, "Login successful")
+    
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+class RefreshAPI(APIView):
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+
+        if not refresh_token:
+            return Response({
+                "status": "fail",
+                "message": "Refresh token required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            token = RefreshToken(refresh_token)
+            access_token = str(token.access_token)
+
+            return Response({
+                "status": "success",
+                "status_code": 200,
+                "message": "Token refreshed",
+                "data": {
+                    "access": access_token
+                }
+            })
+
+        except Exception:
+            return Response({
+                "status": "fail",
+                "message": "Invalid or expired refresh token"
+            }, status=status.HTTP_400_BAD_REQUEST)    

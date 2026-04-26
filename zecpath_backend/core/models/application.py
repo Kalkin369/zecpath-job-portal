@@ -1,20 +1,29 @@
 from django.db import models
 from .candidate import Candidate
 from .job import Job
+from core.utils.file_upload import resume_upload_path
 
 class Application(models.Model):
     STATUS_CHOICES = (
         ('applied','Applied'),
         ('shortlisted','Shortlisted'),
         ('rejected','Rejected'),
+        ('selected','Selected')
     )    
 
     candidate = models.ForeignKey(Candidate,on_delete=models.CASCADE)
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
-    resume = models.FileField(upload_to='resumes/')
+    resume = models.FileField(upload_to=resume_upload_path,null=True,blank=True)
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='applied')   
     ats_score = models.FloatField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    applied_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['candidate','job']
+        indexes = [
+            models.Index(fields=['candidate']),
+            models.Index(fields=['job']),
+        ]
 
     def __str__(self):
         return f"{self.candidate} - {self.job}"

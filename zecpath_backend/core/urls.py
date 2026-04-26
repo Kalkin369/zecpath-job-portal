@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from core.views import *
-from core.views.auth_views import SignupAPI,LoginAPI
+from core.views.auth_views import SignupAPI,LoginAPI,RefreshAPI
 
 
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/signup/', SignupAPI.as_view()),
     path('auth/login/', LoginAPI.as_view()),
+    path('auth/refresh/',RefreshAPI.as_view()),
 ]

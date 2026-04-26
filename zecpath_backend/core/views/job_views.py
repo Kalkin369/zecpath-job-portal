@@ -1,7 +1,7 @@
 from core.views.base_viewset import BaseViewSet
 from core.models.job import Job
 from core.serializers.job_serializer import JobSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from core.permissions import IsEmployer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
@@ -10,32 +10,44 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
+
 class JobViewSet(BaseViewSet):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticated,]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
-    filterset_fields = ['experience','employer']
-    search_fields = ['title','description','skills']
-    ordering_fields = ['created_at','experience']
+    filterset_fields = ['experience','job_type','location']
+    search_fields = ['title','skills','location']
+    ordering_fields = ['created_at','experience','salary_min']
 
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action in ['list','retrieve','latest','featured']:
+            return [AllowAny()]
+        elif self.action == 'create':
             return [IsAuthenticated(),IsEmployer()]
         return [IsAuthenticated()]
     
     def get_queryset(self):
-        user = self.request.user
+      queryset = Job.objects.select_related('employer')
 
-        queryset = Job.objects.select_related('employer')
+    # 🔹 Query params (filters)
+      min_salary = self.request.query_params.get('min_salary')
+      max_salary = self.request.query_params.get('max_salary')
 
-        if user.is_authenticated:
-            # Employer see only thier jobs
-            if hasattr(user,'employer'):
-                return queryset.filter(employer=user.employer)
-        
-        # Others(candidate/public) see only active jobs
-        return queryset.filter(status='active')
+      if min_salary:
+        queryset = queryset.filter(salary_min__gte=min_salary)
+
+      if max_salary:
+        queryset = queryset.filter(salary_max__lte=max_salary)
+
+      user = self.request.user
+
+    # 🔹 Employer → see own jobs
+      if user.is_authenticated and hasattr(user, 'employer'):
+         return queryset.filter(employer=user.employer)
+
+    # 🔹 Public/Candidate → only active jobs
+      return queryset.filter(status='active')
     
     def perform_create(self, serializer):
      user = self.request.user
@@ -46,7 +58,7 @@ class JobViewSet(BaseViewSet):
 
      serializer.save(employer=user.employer)
    
-   
+# Toggle status  
     @action(detail=True, methods=['post'])
     def toggle_status(self, request, pk=None):
         job = self.get_object()
@@ -60,3 +72,17 @@ class JobViewSet(BaseViewSet):
         job.save()
 
         return Response({"message": "Job status updated"})
+    
+#Latest Jobs 
+    @action(detail=False,methods=['get'])
+    def latest(self,request):
+       jobs = Job.objects.filter(status='active').order_by('created_at')[:10]
+       serializer = self.get_serializer(jobs, many=True)
+       return Response(serializer.data)
+    
+#Featured Jobs
+    @action(detail=False, methods=['get'])
+    def featured(self,request):
+       jobs = Job.objects.filter(status='active',experience__lte=2)
+       serializer = self.get_serializer(jobs, many=True)
+       return Response(serializer.data)

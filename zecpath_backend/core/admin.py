@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Job, Application, Employer, Candidate
+from .models import User, Job, Application, Employer, Candidate, ApplicationLog
 
 
 #  User Admin
@@ -44,6 +44,11 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     ordering = ('-applied_at',)
 
+class ApplicationLogAdmin(admin.ModelAdmin):
+    list_display = ('id', 'application', 'old_status', 'new_status', 'changed_at')
+    search_fields = ('application__candidate__user__email',)
+    list_filter = ('new_status',)
+    ordering = ('-changed_at',)
 
 #  Register
 admin.site.register(User, UserAdmin)
@@ -51,3 +56,4 @@ admin.site.register(Job, JobAdmin)
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(Employer, EmployerAdmin)
 admin.site.register(Candidate, CandidateAdmin)
+admin.site.register(ApplicationLog, ApplicationLogAdmin)

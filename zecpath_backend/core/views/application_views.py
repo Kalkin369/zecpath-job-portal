@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from core.models.application_log import ApplicationLog
-
+from core.services.ats_service import extract_resume_text,calculate_score
 
 
 
@@ -62,16 +62,30 @@ class ApplicationViewSet(BaseViewSet):
         if Application.objects.filter(candidate=candidate, job=job).exists():
             raise ValidationError("Already applied to this job")
 
-        #  Resume logic
+     #   Resume logic
         resume = serializer.validated_data.get('resume')
 
-        if not resume:
-            if not candidate.resume:
-                raise ValidationError("No resume provided")
-            serializer.save(candidate=candidate, resume=candidate.resume)
-        else:
-            serializer.save(candidate=candidate)
+        #  Case 1: Resume sent in request
+        if resume:
+          file = resume
 
+        #  Case 2: Use candidate profile resume
+        elif candidate.resume and candidate.resume.name:
+           file = candidate.resume
+
+        #  Case 3: No resume anywhere
+        else:
+          raise ValidationError("No resume provided")
+        
+
+        #  Extract text
+        resume_text = extract_resume_text(file)
+
+        #  Calculate ATS score
+        score = calculate_score(resume_text, job)
+
+        #  Save
+        serializer.save(candidate=candidate, resume=resume, ats_score=score)
 
 
     @action(detail=True, methods=['post'])

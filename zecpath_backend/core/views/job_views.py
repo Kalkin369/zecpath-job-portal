@@ -86,3 +86,16 @@ class JobViewSet(BaseViewSet):
        jobs = Job.objects.filter(status='active',experience__lte=2)
        serializer = self.get_serializer(jobs, many=True)
        return Response(serializer.data)
+    
+#Close Hiring
+    @action(detail=True, methods=['post'])
+    def close_job(self, request, pk=None):
+       job = self.get_object()
+
+       if job.employer != request.user.employer:
+        return Response({"error": "Not allowed"}, status=403)
+
+       job.status = 'inactive'
+       job.save()
+
+       return Response({"message": "Job closed"})  

@@ -24,7 +24,7 @@ class ApplicationViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_fields = ['status']
-    search_fields = ['job','title']
+    search_fields = ['candidate__user__email','job__title']
     orderinig = ['applied_at']
 
     def get_permissions(self):
@@ -87,7 +87,7 @@ class ApplicationViewSet(BaseViewSet):
         #  Save
         serializer.save(candidate=candidate, resume=resume, ats_score=score)
 
-
+# Update Status
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):
         application = self.get_object()
@@ -138,4 +138,70 @@ class ApplicationViewSet(BaseViewSet):
             new_status=new_status
         )
 
-        return Response({"message": "Status updated"})        
+        return Response({"message": "Status updated"}) 
+
+#Applicants for a Job
+    @action(detail=False, methods=['get'], url_path='job/(?P<job_id>[^/.]+)/applicants')
+    def job_applicants(self, request, job_id=None):
+        user = request.user
+
+        if not hasattr(user, 'employer'):
+          return Response({"error": "Only employers allowed"}, status=403)
+
+        applications = self.queryset.filter(
+            job_id=job_id,
+            job__employer=user.employer
+        ).order_by('-ats_score')
+
+        # pagination
+        page = self.paginate_queryset(applications)
+
+        if page is not None:
+           serializer = self.get_serializer(page,many=True)
+           return self.get_paginated_response(serializer.data)
+
+
+        serializer = self.get_serializer(applications, many=True)
+        return Response(serializer.data)       
+    
+# Analytics APIs
+    @action(detail=False, methods=['get'])
+    def analytics(self, request):
+        user = request.user
+
+        if not hasattr(user, 'employer'):
+            return Response({"error": "Not allowed"}, status=403)
+
+        apps = self.queryset.filter(job__employer=user.employer)
+
+        total = apps.count()
+        shortlisted = apps.filter(status='shortlisted').count()
+
+        ratio = (shortlisted / total * 100) if total > 0 else 0
+
+        return Response({
+            "total_applications": total,
+            "shortlisted": shortlisted,
+            "shortlist_ratio": round(ratio, 2)
+        })
+    
+#Status wise counts per job
+    @action(detail=True, methods=['get'])
+    def status_summary(self, request, pk=None):
+        job_id = pk
+        user = request.user
+
+        if not hasattr(user, 'employer'):
+            return Response({"error": "Not allowed"}, status=403)
+
+        applications = Application.objects.filter(
+            job_id=job_id,
+            job__employer=user.employer
+        )
+
+        return Response({
+            "applied": applications.filter(status='applied').count(),
+            "shortlisted": applications.filter(status='shortlisted').count(),
+            "rejected": applications.filter(status='rejected').count(),
+            "selected": applications.filter(status='selected').count(),
+        })   

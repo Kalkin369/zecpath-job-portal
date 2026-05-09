@@ -204,4 +204,26 @@ class ApplicationViewSet(BaseViewSet):
             "shortlisted": applications.filter(status='shortlisted').count(),
             "rejected": applications.filter(status='rejected').count(),
             "selected": applications.filter(status='selected').count(),
-        })   
+        }) 
+
+#Timeline view
+    @action(detail=True, methods=['get'])
+    def timeline(self, request, pk=None):
+
+        application = self.get_object()
+
+        if application.candidate != request.user.candidate:
+           return Response({"error":"Not allowed"},status=403) 
+
+        logs = application.logs.all().order_by('changed_at')
+
+        data = [
+            {
+                "old_status": log.old_status,
+                "new_status": log.new_status,
+                "changed_at": log.changed_at
+            }
+            for log in logs
+        ]
+
+        return Response(data)   

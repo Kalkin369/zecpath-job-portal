@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from core.models.user import User
-from core.serializers.user__serializer import UserSerializer
+from core.serializers.user_serializer import UserSerializer
 
 
 class SignupAPI(APIView):

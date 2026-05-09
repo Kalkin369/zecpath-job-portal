@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from core.models.user import User
-from core.serializers.user__serializer import UserSerializer
+from core.serializers.user_serializer import UserSerializer
 from rest_framework.permissions import IsAuthenticated
 from core.permissions import IsAdmin
 from django_filters.rest_framework import DjangoFilterBackend

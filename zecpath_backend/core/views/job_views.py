@@ -99,3 +99,32 @@ class JobViewSet(BaseViewSet):
        job.save()
 
        return Response({"message": "Job closed"})  
+    
+#Profile based Recommendations
+    @action(detail=False, methods=['get'])
+    def recommended(self, request):
+
+        user = request.user
+
+        if not hasattr(user, 'candidate'):
+            return Response({"error": "Only candidates allowed"}, status=403)
+
+        candidate = user.candidate
+
+        skills = candidate.skills.split(',')
+
+        queryset = Job.objects.filter(status='active')
+
+        matched_jobs = []
+
+        for job in queryset:
+            job_skills = job.skills.lower()
+
+            for skill in skills:
+                if skill.strip().lower() in job_skills:
+                    matched_jobs.append(job)
+                    break
+
+        serializer = self.get_serializer(matched_jobs, many=True)
+
+        return Response(serializer.data)  

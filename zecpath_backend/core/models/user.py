@@ -34,6 +34,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15,blank=True,null=True)
     role = models.CharField(max_length=20,choices=ROLE_CHOICES)
     is_verified = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

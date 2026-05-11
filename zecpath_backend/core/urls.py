@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from core.views import *
 from core.views.auth_views import SignupAPI,LoginAPI,RefreshAPI
 from core.views.saved_job_views import SavedJobViewSet
-
+from core.views.admin_views import AdminEmployerViewSet,AdminUserViewSet,AdminJobViewSet
 
 
 router = DefaultRouter()
@@ -13,6 +13,9 @@ router.register('candidates', CandidateViewSet,basename='candidate')
 router.register('jobs', JobViewSet)
 router.register('applications', ApplicationViewSet)
 router.register('saved-jobs',SavedJobViewSet,basename='saved-jobs')
+router.register('admin/employers',AdminEmployerViewSet,basename='admin-employers')
+router.register('admin/users',AdminUserViewSet,basename='admin-users')
+router.register('admin/jobs',AdminJobViewSet,basename='admin-jobs')
 
 urlpatterns = [
     path('', include(router.urls)),

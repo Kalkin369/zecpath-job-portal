@@ -4,6 +4,7 @@ from core.views import *
 from core.views.auth_views import SignupAPI,LoginAPI,RefreshAPI
 from core.views.saved_job_views import SavedJobViewSet
 from core.views.admin_views import AdminEmployerViewSet,AdminUserViewSet,AdminJobViewSet
+from core.views.resume_parser_views import (ResumeParserAPIView)
 
 
 router = DefaultRouter()
@@ -22,4 +23,5 @@ urlpatterns = [
     path('auth/signup/', SignupAPI.as_view()),
     path('auth/login/', LoginAPI.as_view()),
     path('auth/refresh/',RefreshAPI.as_view()),
+    path('resume-parser/',ResumeParserAPIView.as_view()),
 ]

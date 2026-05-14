@@ -13,8 +13,8 @@ from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from core.models.application_log import ApplicationLog
-from core.services.ats_service import extract_resume_text,calculate_score
-
+from core.services.ats_service import calculate_score
+from core.services.resume_parser_service import extract_resume_text
 
 
 

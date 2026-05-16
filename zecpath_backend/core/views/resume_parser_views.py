@@ -5,6 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from core.services.resume_parser_service import (
     extract_resume_text
 )
+from core.services.resume_nlp_service import (
+    build_resume_json
+)
 
 
 class ResumeParserAPIView(APIView):
@@ -21,7 +24,9 @@ class ResumeParserAPIView(APIView):
             }, status=400)
 
         text = extract_resume_text(file)
+        structured_data = build_resume_json(text)
 
         return Response({
-            "parsed_text": text
+            "parsed_text": text,
+            "structured_data":structured_data
         })

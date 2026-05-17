@@ -21,6 +21,7 @@ class Job(models.Model):
     skills = models.TextField()
 
     experience = models.IntegerField(default=0)
+    qualification = models.CharField(max_length=100,blank=True,null=True)
     salary_min = models.IntegerField(null=True, blank=True)
     salary_max = models.IntegerField(null=True, blank=True)
 

@@ -13,8 +13,9 @@ from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from core.models.application_log import ApplicationLog
-from core.services.ats_service import calculate_score
+from core.services.ats_service import calculate_ats_score
 from core.services.resume_parser_service import extract_resume_text
+from core.services.resume_nlp_service import build_resume_json
 
 
 
@@ -25,7 +26,7 @@ class ApplicationViewSet(BaseViewSet):
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_fields = ['status']
     search_fields = ['candidate__user__email','job__title']
-    orderinig = ['applied_at']
+    ordering = ['applied_at']
 
     def get_permissions(self):
         if self.action == 'create':
@@ -77,15 +78,17 @@ class ApplicationViewSet(BaseViewSet):
         else:
           raise ValidationError("No resume provided")
         
-
+       
         #  Extract text
         resume_text = extract_resume_text(file)
 
         #  Calculate ATS score
-        score = calculate_score(resume_text, job)
+        structured_resume = build_resume_json(resume_text)
+
+        score_data = calculate_ats_score(structured_resume,job)
 
         #  Save
-        serializer.save(candidate=candidate, resume=resume, ats_score=score)
+        serializer.save(candidate=candidate, resume=file, ats_score=score_data['final_score'])
 
 # Update Status
     @action(detail=True, methods=['post'])
@@ -212,7 +215,8 @@ class ApplicationViewSet(BaseViewSet):
 
         application = self.get_object()
 
-        if application.candidate != request.user.candidate:
+        if ( 
+           not hasattr(request.user,'candidate') or application.candidate != request.user.candidate):
            return Response({"error":"Not allowed"},status=403) 
 
         logs = application.logs.all().order_by('changed_at')

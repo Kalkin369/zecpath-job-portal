@@ -20,6 +20,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
     )
     status_message = serializers.SerializerMethodField()
 
+    match_percentage = serializers.SerializerMethodField()
+
     class Meta:
         model = Application
         fields = [
@@ -34,9 +36,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'job_title',
             'job_company',
             'job_status',
-            'status_message'
+            'status_message',
+            'match_percentage'
         ]
-        read_only_fields = ['status', 'applied_at']
+        read_only_fields = ['candidate','status', 'applied_at','ats_score']
 
     def get_status_message(self,obj):
         return f"Your application is currently {obj.status}"    
+    
+    def get_match_percentage(self,obj):
+        return f"{obj.ats_score}%"

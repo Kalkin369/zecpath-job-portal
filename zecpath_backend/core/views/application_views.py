@@ -16,6 +16,7 @@ from core.models.application_log import ApplicationLog
 from core.services.ats_service import calculate_ats_score
 from core.services.resume_parser_service import extract_resume_text
 from core.services.resume_nlp_service import build_resume_json
+from core.services.notification_service import send_application_status_email
 
 
 
@@ -133,6 +134,8 @@ class ApplicationViewSet(BaseViewSet):
 
         application.status = new_status
         application.save()
+
+        send_application_status_email(application)
 
         
         ApplicationLog.objects.create(

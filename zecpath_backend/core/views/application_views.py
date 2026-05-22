@@ -17,7 +17,7 @@ from core.services.ats_service import calculate_ats_score
 from core.services.resume_parser_service import extract_resume_text
 from core.services.resume_nlp_service import build_resume_json
 from core.services.notification_service import send_application_status_email
-
+from core.services.automation_service import auto_update_application_status
 
 
 class ApplicationViewSet(BaseViewSet):
@@ -88,8 +88,11 @@ class ApplicationViewSet(BaseViewSet):
 
         score_data = calculate_ats_score(structured_resume,job)
 
-        #  Save
-        serializer.save(candidate=candidate, resume=file, ats_score=score_data['final_score'])
+        #  Save application
+        application = serializer.save(candidate=candidate, resume=file, ats_score=score_data['final_score'])
+
+        # Auto automation
+        auto_update_application_status(application)
 
 # Update Status
     @action(detail=True, methods=['post'])

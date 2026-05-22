@@ -22,6 +22,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     match_percentage = serializers.SerializerMethodField()
 
+    automation_status = serializers.SerializerMethodField()
+
     class Meta:
         model = Application
         fields = [
@@ -46,3 +48,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
     
     def get_match_percentage(self,obj):
         return f"{obj.ats_score}%"
+    
+    def get_automation_status(self,obj):
+        
+        if obj.status == 'shortlisted':
+            return 'Auto Shortlisted'
+        
+        if obj.status == 'rejected':
+            return 'Auto Rejected'
+        
+        return 'Manual Review'

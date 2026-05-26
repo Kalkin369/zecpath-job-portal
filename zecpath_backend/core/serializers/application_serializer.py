@@ -39,7 +39,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'job_company',
             'job_status',
             'status_message',
-            'match_percentage'
+            'match_percentage',
+            'automation_status'
         ]
         read_only_fields = ['candidate','status', 'applied_at','ats_score']
 

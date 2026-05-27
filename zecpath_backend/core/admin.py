@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Job, Application, Employer, Candidate, ApplicationLog
+from .models import User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog
 
 
 #  User Admin
@@ -57,3 +57,4 @@ admin.site.register(Application, ApplicationAdmin)
 admin.site.register(Employer, EmployerAdmin)
 admin.site.register(Candidate, CandidateAdmin)
 admin.site.register(ApplicationLog, ApplicationLogAdmin)
+admin.site.register(NotificationLog)

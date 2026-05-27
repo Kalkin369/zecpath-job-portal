@@ -165,6 +165,6 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = 'vishnuprakash8138@gmail.com'
 
-EMAIL_HOST_PASSWORD = 'your_app_password'
+EMAIL_HOST_PASSWORD = 'cnxrwwmbblryhaqr'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

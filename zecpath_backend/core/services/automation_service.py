@@ -26,6 +26,8 @@ def auto_update_application_status(application):
     application.status = new_status
 
     application.save()
+    
+     
 
     ApplicationLog.objects.create(
         application=application,
@@ -33,5 +35,7 @@ def auto_update_application_status(application):
         new_status=new_status
     )
 
-    send_application_status_email(application)    
+    send_application_status_email(application)
+
+     
     

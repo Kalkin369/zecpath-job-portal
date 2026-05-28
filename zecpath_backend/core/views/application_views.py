@@ -19,9 +19,11 @@ from core.services.resume_nlp_service import build_resume_json
 from core.services.notification_service import send_application_status_email
 from core.services.automation_service import auto_update_application_status
 
+from django.core.cache import cache
+
 
 class ApplicationViewSet(BaseViewSet):
-    queryset = Application.objects.select_related('job', 'candidate')
+    queryset = Application.objects.select_related('job','job__employer', 'candidate','candidate__user')
     serializer_class = ApplicationSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
@@ -176,44 +178,105 @@ class ApplicationViewSet(BaseViewSet):
 # Analytics APIs
     @action(detail=False, methods=['get'])
     def analytics(self, request):
+
         user = request.user
 
         if not hasattr(user, 'employer'):
-            return Response({"error": "Not allowed"}, status=403)
+            return Response(
+                {"error": "Not allowed"},
+                status=403
+            )
 
-        apps = self.queryset.filter(job__employer=user.employer)
+        # Unique cache per employer
+        cache_key = f'analytics_{user.id}'
+
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data)
+
+        apps = self.queryset.filter(
+            job__employer=user.employer
+        )
 
         total = apps.count()
-        shortlisted = apps.filter(status='shortlisted').count()
 
-        ratio = (shortlisted / total * 100) if total > 0 else 0
+        shortlisted = apps.filter(
+            status='shortlisted'
+        ).count()
 
-        return Response({
+        ratio = (
+            shortlisted / total * 100
+        ) if total > 0 else 0
+
+        data = {
             "total_applications": total,
             "shortlisted": shortlisted,
             "shortlist_ratio": round(ratio, 2)
-        })
+        }
+
+        # Cache for 2 minutes
+        cache.set(
+            cache_key,
+            data,
+            timeout=120
+        )
+
+        return Response(data)
     
 #Status wise counts per job
     @action(detail=True, methods=['get'])
     def status_summary(self, request, pk=None):
+
         job_id = pk
+
         user = request.user
 
         if not hasattr(user, 'employer'):
-            return Response({"error": "Not allowed"}, status=403)
+            return Response(
+                {"error": "Not allowed"},
+                status=403
+            )
+
+        # Unique cache per job
+        cache_key = f'status_summary_{job_id}'
+
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return Response(cached_data)
 
         applications = Application.objects.filter(
             job_id=job_id,
             job__employer=user.employer
         )
 
-        return Response({
-            "applied": applications.filter(status='applied').count(),
-            "shortlisted": applications.filter(status='shortlisted').count(),
-            "rejected": applications.filter(status='rejected').count(),
-            "selected": applications.filter(status='selected').count(),
-        }) 
+        data = {
+            "applied": applications.filter(
+                status='applied'
+            ).count(),
+
+            "shortlisted": applications.filter(
+                status='shortlisted'
+            ).count(),
+
+            "rejected": applications.filter(
+                status='rejected'
+            ).count(),
+
+            "selected": applications.filter(
+                status='selected'
+            ).count(),
+        }
+
+        # Cache for 2 minutes
+        cache.set(
+            cache_key,
+            data,
+            timeout=120
+        )
+
+        return Response(data)
 
 #Timeline view
     @action(detail=True, methods=['get'])

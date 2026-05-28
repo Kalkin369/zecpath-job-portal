@@ -16,7 +16,7 @@ class Job(models.Model):
 
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255,db_index=True)
     description = models.TextField()
     skills = models.TextField()
 
@@ -28,7 +28,7 @@ class Job(models.Model):
     location = models.CharField(max_length=255)
     job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
 
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active',db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

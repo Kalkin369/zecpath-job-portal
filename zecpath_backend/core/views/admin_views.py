@@ -12,6 +12,7 @@ from core.models.application import Application
 from core.serializers.employer_serializer import EmployerSerializer
 from core.serializers.user_serializer import UserSerializer
 from core.serializers.job_serializer import JobSerializer
+from django.core.cache import cache
 
 
 
@@ -84,12 +85,19 @@ class AdminJobViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def stats(self, request):
 
+        cached_stats = cache.get('platform_stats')
+
+        if cached_stats:
+            return Response(cached_stats)
+
         data = {
             "total_users": User.objects.count(),
             "total_jobs": Job.objects.count(),
             "total_applications": Application.objects.count(),
             "total_employers": Employer.objects.count(),
         }
+
+        cache.set('platform_stats',data,timeout=120)
 
         return Response(data)
        

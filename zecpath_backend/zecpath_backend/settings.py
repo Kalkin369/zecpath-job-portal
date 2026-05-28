@@ -168,3 +168,7 @@ EMAIL_HOST_USER = 'vishnuprakash8138@gmail.com'
 EMAIL_HOST_PASSWORD = 'cnxrwwmbblryhaqr'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+CACHES = {
+    'default':{'BACKEND':'django.core.cache.backends.locmem.LocMemCache', }
+}

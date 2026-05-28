@@ -10,9 +10,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.core.cache import cache
+
 
 class JobViewSet(BaseViewSet):
-    queryset = Job.objects.all()
+    queryset = Job.objects.select_related('employer')
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticated,]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
@@ -76,15 +78,34 @@ class JobViewSet(BaseViewSet):
 #Latest Jobs 
     @action(detail=False,methods=['get'])
     def latest(self,request):
-       jobs = Job.objects.filter(status='active').order_by('created_at')[:10]
+       
+       cached_jobs = cache.get('latest_jobs')
+
+       if cached_jobs:
+          return Response (cached_jobs)
+       
+       jobs = self.queryset.filter(status='active').order_by('created_at')[:10]
        serializer = self.get_serializer(jobs, many=True)
+
+       cache.set('latest_jobs',serializer.data,timeout=60)
+       
        return Response(serializer.data)
     
 #Featured Jobs
     @action(detail=False, methods=['get'])
     def featured(self,request):
-       jobs = Job.objects.filter(status='active',experience__lte=2)
+       
+       cached_jobs = cache.get('featured_jobs')
+
+       if cached_jobs:
+          return Response(cached_jobs)
+       
+
+       jobs = self.queryset.filter(status='active',experience__lte=2)[:5]
        serializer = self.get_serializer(jobs, many=True)
+
+       cache.set('featured_jobs',serializer.data,timeout=60)
+
        return Response(serializer.data)
       
 #Profile based Recommendations

@@ -2,7 +2,7 @@ import os
 from django.core.exceptions import ValidationError
 
 def validate_resume(file):
-    ext = os.path.splitext(file.name)[1]
+    ext = os.path.splitext(file.name)[1].lower()
     allowed_extensions = ['.pdf','.doc','.docx']
 
     if ext.lower() not in allowed_extensions:

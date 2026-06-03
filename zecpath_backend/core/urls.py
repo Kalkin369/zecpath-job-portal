@@ -5,6 +5,7 @@ from core.views.auth_views import SignupAPI,LoginAPI,RefreshAPI
 from core.views.saved_job_views import SavedJobViewSet
 from core.views.admin_views import AdminEmployerViewSet,AdminUserViewSet,AdminJobViewSet
 from core.views.resume_parser_views import (ResumeParserAPIView)
+from core.views.notification_log_views import (NotificationLogViewSet)
 
 
 router = DefaultRouter()
@@ -17,6 +18,7 @@ router.register('saved-jobs',SavedJobViewSet,basename='saved-jobs')
 router.register('admin/employers',AdminEmployerViewSet,basename='admin-employers')
 router.register('admin/users',AdminUserViewSet,basename='admin-users')
 router.register('admin/jobs',AdminJobViewSet,basename='admin-jobs')
+router.register('notification-logs',NotificationLogViewSet,basename='notification-logs')
 
 urlpatterns = [
     path('', include(router.urls)),

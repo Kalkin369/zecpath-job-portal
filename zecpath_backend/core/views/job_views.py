@@ -14,7 +14,7 @@ from django.core.cache import cache
 
 
 class JobViewSet(BaseViewSet):
-    queryset = Job.objects.select_related('employer')
+    queryset = Job.objects.select_related('employer').order_by('-created_at')
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticated,]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]

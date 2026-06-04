@@ -2,7 +2,7 @@ SHORTLIST_THRESHOLD = 70
 REJECT_THRESHOLD = 30
 
 from core.models.application_log import (ApplicationLog)
-from core.services.notification_service import (send_application_status_email)
+from core.tasks import (send_status_email_task)
 
 def determine_application_status(ats_score):
 
@@ -35,7 +35,7 @@ def auto_update_application_status(application):
         new_status=new_status
     )
 
-    send_application_status_email(application)
+    send_status_email_task(application.id)
 
      
     

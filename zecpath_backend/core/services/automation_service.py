@@ -4,6 +4,9 @@ REJECT_THRESHOLD = 30
 from core.models.application_log import (ApplicationLog)
 from core.tasks import (send_status_email_task)
 
+from core.services.eligibility_service import (is_eligible_for_ai_call)
+from core.services.ai_call_service import (queue_ai_call)
+
 def determine_application_status(ats_score):
 
     if ats_score >= SHORTLIST_THRESHOLD:
@@ -26,6 +29,11 @@ def auto_update_application_status(application):
     application.status = new_status
 
     application.save()
+
+    if new_status == 'shortlisted':
+        if is_eligible_for_ai_call(application):
+
+           queue_ai_call(application)
     
      
 
@@ -35,7 +43,7 @@ def auto_update_application_status(application):
         new_status=new_status
     )
 
-    send_status_email_task(application.id)
+    send_status_email_task.delay(application.id)
 
      
     

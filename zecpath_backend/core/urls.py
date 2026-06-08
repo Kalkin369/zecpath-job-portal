@@ -6,7 +6,11 @@ from core.views.saved_job_views import SavedJobViewSet
 from core.views.admin_views import AdminEmployerViewSet,AdminUserViewSet,AdminJobViewSet
 from core.views.resume_parser_views import (ResumeParserAPIView)
 from core.views.notification_log_views import (NotificationLogViewSet)
-from core.views.ai_call_views import(AICallViewSet)
+from core.views.ai_call_views import (AICallViewSet)
+from core.views.ai_interview_session_views import (AIInterviewSessionViewSet)
+from core.views.ai_question_views import (AIQuestionViewSet)
+from core.views.ai_answer_views import (AIAnswerViewSet)
+from core.views.call_log_views import (CallLogViewSet)
 
 
 router = DefaultRouter()
@@ -21,6 +25,10 @@ router.register('admin/users',AdminUserViewSet,basename='admin-users')
 router.register('admin/jobs',AdminJobViewSet,basename='admin-jobs')
 router.register('notification-logs',NotificationLogViewSet,basename='notification-logs')
 router.register('ai-calls',AICallViewSet,basename='ai-calls')
+router.register('ai-sessions',AIInterviewSessionViewSet,basename='ai-sessions')
+router.register('ai-questions',AIQuestionViewSet,basename='ai-questions')
+router.register('ai-answers',AIAnswerViewSet,basename='ai-answers')
+router.register('call-logs',CallLogViewSet,basename='call-logs')
 
 urlpatterns = [
     path('', include(router.urls)),

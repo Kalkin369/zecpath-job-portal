@@ -7,3 +7,7 @@ from .application_log import ApplicationLog
 from .saved_job import SavedJob
 from .notification_log import NotificationLog
 from .ai_call import AICall
+from .ai_interview_session import AIInterviewSession
+from .ai_question import AIQuestion
+from .ai_answer import AIAnswer
+from .call_log import CallLog

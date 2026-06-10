@@ -163,9 +163,9 @@ EMAIL_PORT = 587
 
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'vishnuprakash8138@gmail.com'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 
-EMAIL_HOST_PASSWORD = 'cnxrwwmbblryhaqr'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
@@ -175,3 +175,10 @@ CACHES = {
 
 CELERY_BROKER_URL =('redis://localhost:6379/0')
 CELERY_RESULT_BACKEND =('redis://localhost:6379/0')
+
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+ELEVENLABS_API_KEY = os.getenv('ELEVENLABS_API_KEY')
+
+TWILIO_API_KEY = os.getenv('TWILIO_API_KEY')

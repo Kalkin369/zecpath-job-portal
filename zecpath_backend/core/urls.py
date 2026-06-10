@@ -11,6 +11,8 @@ from core.views.ai_interview_session_views import (AIInterviewSessionViewSet)
 from core.views.ai_question_views import (AIQuestionViewSet)
 from core.views.ai_answer_views import (AIAnswerViewSet)
 from core.views.call_log_views import (CallLogViewSet)
+from core.views.ai_integration_views import (GenerateQuestionAPIView,TextToSpeechAPIView,SpeechToTextAPIView,TriggerCallAPIView)
+
 
 
 router = DefaultRouter()
@@ -36,4 +38,8 @@ urlpatterns = [
     path('auth/login/', LoginAPI.as_view()),
     path('auth/refresh/',RefreshAPI.as_view()),
     path('resume-parser/',ResumeParserAPIView.as_view()),
+    path('ai/generate-question/',GenerateQuestionAPIView.as_view()),
+    path('ai/text-to-speech/',TextToSpeechAPIView.as_view()),
+    path('ai/speech-to-text/',SpeechToTextAPIView.as_view()),
+    path('ai/trigger-call/',TriggerCallAPIView.as_view()),
 ]

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog
+from .models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
+                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob)
 
 
 #  User Admin
@@ -50,6 +51,92 @@ class ApplicationLogAdmin(admin.ModelAdmin):
     list_filter = ('new_status',)
     ordering = ('-changed_at',)
 
+class NotificationLogAdmin(admin.ModelAdmin):
+
+    list_display = ('id','user','subject','status','created_at')
+
+    search_fields = ('user__email','subject')
+
+    list_filter = ('status',)
+
+    readonly_fields = ('created_at',)
+
+    ordering = ('-created_at',)  
+
+class SavedJobAdmin(admin.ModelAdmin):
+
+    list_display = ('id','candidate','job','saved_at')
+
+    search_fields = ('candidate__user__email','job__title')
+
+    ordering = ('-saved_at',)      
+
+class AICallAdmin(admin.ModelAdmin):
+
+    list_display = ('id','application','status','retry_count','created_at')
+
+    search_fields = ('application__candidate__user__email',)
+
+    list_filter = ('status',)
+
+    ordering = ('-created_at',)  
+
+class AIInterviewSessionAdmin(admin.ModelAdmin):
+
+    list_display = ('id','ai_call','status','started_at')
+
+    search_fields = ('ai_call__id',)
+
+    list_filter = ('status',)
+
+    ordering = ('-started_at',)
+
+
+class AIQuestionAdmin(admin.ModelAdmin):
+
+    list_display = ('id','session','template','created_at')
+
+    search_fields = ('question_text',)
+
+    ordering = ('-created_at',)
+
+
+
+class AIAnswerAdmin(admin.ModelAdmin):
+
+    list_display = ('id','question','score','created_at')
+
+    search_fields = ('answer_text',)
+
+    ordering = ('-created_at',) 
+
+class CallLogAdmin(admin.ModelAdmin):
+
+    list_display = ('id','ai_call','event','triggered_by','created_at')
+
+    search_fields = ('event','triggered_by')
+
+    ordering = ('-created_at',)
+
+
+
+
+class InterviewStateAdmin(admin.ModelAdmin):
+
+    list_display = ('id','session','current_question_index','current_category','is_completed')
+
+    list_filter = ('is_completed','current_category') 
+
+class QuestionTemplateAdmin(admin.ModelAdmin):
+
+    list_display = ('id','role','category','is_follow_up','created_at')
+
+    search_fields = ('role','question')
+
+    list_filter = ('role','category','is_follow_up')
+
+    ordering = ('role','category')                     
+
 #  Register
 admin.site.register(User, UserAdmin)
 admin.site.register(Job, JobAdmin)
@@ -57,4 +144,12 @@ admin.site.register(Application, ApplicationAdmin)
 admin.site.register(Employer, EmployerAdmin)
 admin.site.register(Candidate, CandidateAdmin)
 admin.site.register(ApplicationLog, ApplicationLogAdmin)
-admin.site.register(NotificationLog)
+admin.site.register(NotificationLog,NotificationLogAdmin)
+admin.site.register(SavedJob,SavedJobAdmin)
+admin.site.register(AICall,AICallAdmin)
+admin.site.register(AIInterviewSession,AIInterviewSessionAdmin)
+admin.site.register(AIQuestion,AIQuestionAdmin)
+admin.site.register(AIAnswer,AIAnswerAdmin)
+admin.site.register(CallLog,CallLogAdmin)
+admin.site.register(InterviewState,InterviewStateAdmin)
+admin.site.register(QuestionTemplate,QuestionTemplateAdmin)

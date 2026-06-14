@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
-                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob)
+from core.models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
+                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation)
 
 
 #  User Admin
@@ -135,7 +135,15 @@ class QuestionTemplateAdmin(admin.ModelAdmin):
 
     list_filter = ('role','category','is_follow_up')
 
-    ordering = ('role','category')                     
+    ordering = ('role','category') 
+
+
+
+class AnswerEvaluationAdmin(admin.ModelAdmin):
+
+    list_display = ('id','answer','total_score','created_at')
+
+    ordering = ('-created_at',)                        
 
 #  Register
 admin.site.register(User, UserAdmin)
@@ -153,3 +161,4 @@ admin.site.register(AIAnswer,AIAnswerAdmin)
 admin.site.register(CallLog,CallLogAdmin)
 admin.site.register(InterviewState,InterviewStateAdmin)
 admin.site.register(QuestionTemplate,QuestionTemplateAdmin)
+admin.site.register(AnswerEvaluation,AnswerEvaluationAdmin)

@@ -21,6 +21,10 @@ class QuestionTemplate(models.Model):
     )
 
     question = models.TextField()
+    
+    expected_keywords = models.JSONField(default=list,blank=True)
+
+    weight = models.FloatField(default=1)
 
     is_follow_up = models.BooleanField(
         default=False

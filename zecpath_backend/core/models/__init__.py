@@ -13,3 +13,4 @@ from .ai_answer import AIAnswer
 from .call_log import CallLog
 from .question_template import QuestionTemplate
 from .interview_state import InterviewState
+from .answer_evaluation import AnswerEvaluation

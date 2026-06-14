@@ -13,6 +13,7 @@ from core.views.ai_answer_views import (AIAnswerViewSet)
 from core.views.call_log_views import (CallLogViewSet)
 from core.views.ai_integration_views import (GenerateQuestionAPIView,TextToSpeechAPIView,SpeechToTextAPIView,TriggerCallAPIView)
 from core.views.question_engine_views import(NextQuestionAPIView,SubmitAnswerAPIView)
+from core.views.answer_evaluation_views import (EvaluateAnswerAPIView,AnswerEvaluationDetailAPIView)
 
 
 
@@ -45,4 +46,6 @@ urlpatterns = [
     path('ai/trigger-call/',TriggerCallAPIView.as_view()),
     path('question-engine/next-question/',NextQuestionAPIView.as_view()),
     path('question-engine/answer/',SubmitAnswerAPIView.as_view()),
+    path('evaluate-answer/',EvaluateAnswerAPIView.as_view(),name='evaluate-answer'),
+    path('evaluations/<int:evaluation_id>/',AnswerEvaluationDetailAPIView.as_view(),name='evaluation-detail'),
 ]

@@ -3,6 +3,9 @@ from celery import shared_task
 from core.models.application import Application
 from core.services.notification_service import (send_application_status_email)
 from core.models import (InterviewSchedule)
+from core.services.reminder_service import ReminderService
+from django.utils import timezone
+from core.services.reminder_message_service import (ReminderMessageService)
 
 @shared_task
 def test_task():
@@ -37,6 +40,34 @@ def send_schedule_email_task(schedule_id):
     except Exception as e:
 
         return {"status": "failed","error": str(e)}
+
+@shared_task
+def send_interview_reminder_task():
+
+    reminders = (
+        ReminderService().get_pending_reminders())
+
+    for reminder in reminders:
+
+        try:
+
+            message = (ReminderMessageService().build_email(reminder.schedule))
+
+            print(message)
+
+            reminder.status = 'sent'
+
+            reminder.sent_at = (timezone.now())
+
+            reminder.save()
+
+        except Exception as e:
+
+            print(f"Reminder failed: {e}")
+
+            reminder.status = ('failed')
+
+            reminder.save()        
 
 
 

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from core.models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
-                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation,InterviewSchedule,AvailabilitySlot)
+                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation,InterviewSchedule,
+                     AvailabilitySlot,InterviewReminder)
 
 
 #  User Admin
@@ -160,7 +161,14 @@ class AvailabilitySlotAdmin(admin.ModelAdmin):
 
     list_filter = ('is_booked','role')
 
-    ordering = ('start_time',)    
+    ordering = ('start_time',)  
+
+
+class InterviewReminderAdmin(admin.ModelAdmin):
+
+    list_display = ('id','schedule','reminder_type','status','scheduled_for','sent_at')
+
+    list_filter = ('status','reminder_type')      
 
 
 
@@ -183,3 +191,4 @@ admin.site.register(QuestionTemplate,QuestionTemplateAdmin)
 admin.site.register(AnswerEvaluation,AnswerEvaluationAdmin)
 admin.site.register(InterviewSchedule,InterviewScheduleAdmin)
 admin.site.register(AvailabilitySlot,AvailabilitySlotAdmin)
+admin.site.register(InterviewReminder,InterviewReminderAdmin)

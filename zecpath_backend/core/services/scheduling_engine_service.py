@@ -1,5 +1,6 @@
 from core.models import (AvailabilitySlot,InterviewSchedule)
 from core.tasks import (send_schedule_email_task)
+from core.services.reminder_service import (ReminderService)
 
 
 class SchedulingEngineService:
@@ -50,6 +51,8 @@ class SchedulingEngineService:
                 scheduled_at=slot.start_time
             )
         )
+
+        ReminderService().create_reminders(schedule)
 
         slot.is_booked = True
         slot.save()

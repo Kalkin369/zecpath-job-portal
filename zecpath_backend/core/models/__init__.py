@@ -16,3 +16,4 @@ from .interview_state import InterviewState
 from .answer_evaluation import AnswerEvaluation
 from .interview_schedule import InterviewSchedule
 from .availability_slot import AvailabilitySlot
+from .interview_reminder import InterviewReminder

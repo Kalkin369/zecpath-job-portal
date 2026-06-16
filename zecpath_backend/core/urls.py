@@ -17,7 +17,7 @@ from core.views.answer_evaluation_views import (EvaluateAnswerAPIView,AnswerEval
 from core.views.interview_schedule_workflow_views import (ScheduleInterviewAPIView,RescheduleInterviewAPIView)
 from core.views.interview_schedule_viewset import (InterviewScheduleViewSet)
 from core.views.availability_slot_viewset import (AvailabilitySlotViewSet)
-
+from core.views.interview_reminder_views import (InterviewReminderViewSet)
 
 
 router = DefaultRouter()
@@ -38,6 +38,7 @@ router.register('ai-answers',AIAnswerViewSet,basename='ai-answers')
 router.register('call-logs',CallLogViewSet,basename='call-logs')
 router.register('interview-schedules',InterviewScheduleViewSet,basename='interview-schedule')
 router.register('availability-slots',AvailabilitySlotViewSet,basename='availability-slot')
+router.register('interview-reminders',InterviewReminderViewSet,basename='interview-reminders')
 
 urlpatterns = [
     path('', include(router.urls)),

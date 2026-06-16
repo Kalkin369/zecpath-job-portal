@@ -14,6 +14,9 @@ from core.views.call_log_views import (CallLogViewSet)
 from core.views.ai_integration_views import (GenerateQuestionAPIView,TextToSpeechAPIView,SpeechToTextAPIView,TriggerCallAPIView)
 from core.views.question_engine_views import(NextQuestionAPIView,SubmitAnswerAPIView)
 from core.views.answer_evaluation_views import (EvaluateAnswerAPIView,AnswerEvaluationDetailAPIView)
+from core.views.interview_schedule_workflow_views import (ScheduleInterviewAPIView,RescheduleInterviewAPIView)
+from core.views.interview_schedule_viewset import (InterviewScheduleViewSet)
+from core.views.availability_slot_viewset import (AvailabilitySlotViewSet)
 
 
 
@@ -33,6 +36,8 @@ router.register('ai-sessions',AIInterviewSessionViewSet,basename='ai-sessions')
 router.register('ai-questions',AIQuestionViewSet,basename='ai-questions')
 router.register('ai-answers',AIAnswerViewSet,basename='ai-answers')
 router.register('call-logs',CallLogViewSet,basename='call-logs')
+router.register('interview-schedules',InterviewScheduleViewSet,basename='interview-schedule')
+router.register('availability-slots',AvailabilitySlotViewSet,basename='availability-slot')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -48,4 +53,6 @@ urlpatterns = [
     path('question-engine/answer/',SubmitAnswerAPIView.as_view()),
     path('evaluate-answer/',EvaluateAnswerAPIView.as_view(),name='evaluate-answer'),
     path('evaluations/<int:evaluation_id>/',AnswerEvaluationDetailAPIView.as_view(),name='evaluation-detail'),
+    path('schedule-interview/',ScheduleInterviewAPIView.as_view()),
+    path('reschedule-interview/<int:schedule_id>/',RescheduleInterviewAPIView.as_view()),
 ]

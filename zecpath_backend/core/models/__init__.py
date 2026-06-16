@@ -14,3 +14,5 @@ from .call_log import CallLog
 from .question_template import QuestionTemplate
 from .interview_state import InterviewState
 from .answer_evaluation import AnswerEvaluation
+from .interview_schedule import InterviewSchedule
+from .availability_slot import AvailabilitySlot

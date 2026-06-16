@@ -1,6 +1,6 @@
 from django.contrib import admin
 from core.models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
-                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation)
+                     AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation,InterviewSchedule,AvailabilitySlot)
 
 
 #  User Admin
@@ -143,7 +143,26 @@ class AnswerEvaluationAdmin(admin.ModelAdmin):
 
     list_display = ('id','answer','total_score','created_at')
 
-    ordering = ('-created_at',)                        
+    ordering = ('-created_at',) 
+
+class InterviewScheduleAdmin(admin.ModelAdmin):
+
+    list_display = ('id','application','scheduled_at','status','created_at')
+
+    list_filter = ('status',)
+
+    ordering = ('-scheduled_at',)
+
+
+class AvailabilitySlotAdmin(admin.ModelAdmin):
+
+    list_display = ('id','role','start_time','end_time','is_booked')
+
+    list_filter = ('is_booked','role')
+
+    ordering = ('start_time',)    
+
+
 
 #  Register
 admin.site.register(User, UserAdmin)
@@ -162,3 +181,5 @@ admin.site.register(CallLog,CallLogAdmin)
 admin.site.register(InterviewState,InterviewStateAdmin)
 admin.site.register(QuestionTemplate,QuestionTemplateAdmin)
 admin.site.register(AnswerEvaluation,AnswerEvaluationAdmin)
+admin.site.register(InterviewSchedule,InterviewScheduleAdmin)
+admin.site.register(AvailabilitySlot,AvailabilitySlotAdmin)

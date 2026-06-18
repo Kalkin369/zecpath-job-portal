@@ -1,7 +1,7 @@
 from django.contrib import admin
 from core.models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
                      AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation,InterviewSchedule,
-                     AvailabilitySlot,InterviewReminder)
+                     AvailabilitySlot,InterviewReminder,CandidateReport)
 
 
 #  User Admin
@@ -168,7 +168,12 @@ class InterviewReminderAdmin(admin.ModelAdmin):
 
     list_display = ('id','schedule','reminder_type','status','scheduled_for','sent_at')
 
-    list_filter = ('status','reminder_type')      
+    list_filter = ('status','reminder_type')  
+
+
+class CandidateReportAdmin(admin.ModelAdmin):
+
+    list_display = ('id','application','ats_score','ai_score')        
 
 
 
@@ -192,3 +197,4 @@ admin.site.register(AnswerEvaluation,AnswerEvaluationAdmin)
 admin.site.register(InterviewSchedule,InterviewScheduleAdmin)
 admin.site.register(AvailabilitySlot,AvailabilitySlotAdmin)
 admin.site.register(InterviewReminder,InterviewReminderAdmin)
+admin.site.register(CandidateReport,CandidateReportAdmin)

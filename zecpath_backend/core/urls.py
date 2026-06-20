@@ -20,6 +20,7 @@ from core.views.availability_slot_viewset import (AvailabilitySlotViewSet)
 from core.views.interview_reminder_views import (InterviewReminderViewSet)
 from core.views.candidate_report_views import (CandidateReportViewSet)
 from core.views.candidate_report_workflow_views import (GenerateReportAPIView)
+from core.views.recruiter_analytics_views import (RecruiterAnalyticsAPIView)
 
 
 router = DefaultRouter()
@@ -60,4 +61,5 @@ urlpatterns = [
     path('schedule-interview/',ScheduleInterviewAPIView.as_view()),
     path('reschedule-interview/<int:schedule_id>/',RescheduleInterviewAPIView.as_view()),
     path('generate-report/',GenerateReportAPIView.as_view(),name='generate-report'),
+    path('analytics/',RecruiterAnalyticsAPIView.as_view(),name='analytics'),
 ]

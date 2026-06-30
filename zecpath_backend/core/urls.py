@@ -21,6 +21,10 @@ from core.views.interview_reminder_views import (InterviewReminderViewSet)
 from core.views.candidate_report_views import (CandidateReportViewSet)
 from core.views.candidate_report_workflow_views import (GenerateReportAPIView)
 from core.views.recruiter_analytics_views import (RecruiterAnalyticsAPIView)
+from core.views.security_log_views import (SecurityTestAPIView,SecurityLogViewSet)
+from core.views.audit_trail_views import (AuditTrailViewSet)
+from core.views.error_log_views import (ErrorLogViewSet)
+
 
 
 router = DefaultRouter()
@@ -43,6 +47,9 @@ router.register('interview-schedules',InterviewScheduleViewSet,basename='intervi
 router.register('availability-slots',AvailabilitySlotViewSet,basename='availability-slot')
 router.register('interview-reminders',InterviewReminderViewSet,basename='interview-reminders')
 router.register('candidate-reports',CandidateReportViewSet,basename='candidate-reports')
+router.register('security-logs',SecurityLogViewSet,basename='security-logs')
+router.register('audit-trails',AuditTrailViewSet,basename='audit-trails')
+router.register('error-logs',ErrorLogViewSet,basename='error-logs')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -62,4 +69,5 @@ urlpatterns = [
     path('reschedule-interview/<int:schedule_id>/',RescheduleInterviewAPIView.as_view()),
     path('generate-report/',GenerateReportAPIView.as_view(),name='generate-report'),
     path('analytics/',RecruiterAnalyticsAPIView.as_view(),name='analytics'),
+    path('security-test/',SecurityTestAPIView.as_view()),
 ]

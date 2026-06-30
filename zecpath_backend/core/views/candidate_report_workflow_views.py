@@ -16,6 +16,8 @@ from core.serializers.candidate_report_serializer import (
     CandidateReportSerializer
 )
 
+from core.services.logging_service import (LoggingService)
+
 class GenerateReportAPIView(
     APIView
 ):
@@ -53,7 +55,29 @@ class GenerateReportAPIView(
                 )
             )
 
+            report = (
+                CandidateReportService()
+                .generate_report(
+                    application
+                )
+            )
+
+            serializer = (
+                CandidateReportSerializer(
+                    report
+                )
+            )
+
+            return Response(
+                serializer.data
+            )
+
         except Application.DoesNotExist:
+
+            LoggingService().create_error_log(
+                "GenerateReportAPIView",
+                f"Application {application_id} not found"
+            )
 
             return Response(
                 {
@@ -63,19 +87,17 @@ class GenerateReportAPIView(
                 status=404
             )
 
-        report = (
-            CandidateReportService()
-            .generate_report(
-                application
-            )
-        )
+        except Exception as e:
 
-        serializer = (
-            CandidateReportSerializer(
-                report
+            LoggingService().create_error_log(
+                "GenerateReportAPIView",
+                str(e)
             )
-        )
 
-        return Response(
-            serializer.data
-        )
+            return Response(
+                {
+                    "error":
+                    "Failed to generate report"
+                },
+                status=500
+            )

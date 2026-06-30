@@ -13,9 +13,8 @@ class ReminderService:
 
         return (
             InterviewReminder.objects.filter(
-                status='pending',
-                scheduled_for__lte=
-                timezone.now()
+                status='pending',scheduled_for_lte=timezone.now()
+                
             )
         )
     

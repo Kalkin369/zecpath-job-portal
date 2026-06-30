@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from core.utils.response import success_response
+from core.services.logging_service import LoggingService
 
 class BaseViewSet(ModelViewSet):
 
@@ -12,17 +13,60 @@ class BaseViewSet(ModelViewSet):
         return success_response(response.data)
     
     def create(self,request,*args,**kwargs):
-        response =super().create(request,*args,**kwargs)
-        return success_response(response.data,message="Created Successfully",status_code=201)
+
+        response = super().create(
+            request,
+            *args,
+            **kwargs
+        )
+
+        LoggingService().create_audit_log(
+            request.user,
+            "CREATE",
+            self.get_queryset().model.__name__,
+            response.data.get("id")
+        )
+
+        return success_response(
+            response.data,
+            message="Created Successfully",
+            status_code=201
+        )
     
     def update(self,request,*args,**kwargs):
         response = super().update(request,*args,**kwargs)
+
+        LoggingService().create_audit_log(
+            request.user,
+            "UPDATE",
+            self.get_queryset().model.__name__,
+            kwargs.get("pk")
+    )
         return success_response(response.data,message="Updated successfully")
     
     def partial_update(self, request, *args, **kwargs):
         response =super().partial_update(request, *args, **kwargs)
+
+        LoggingService().create_audit_log(
+            request.user,
+            "PARTIAL_UPDATE",
+            self.get_queryset().model.__name__,
+            kwargs.get("pk")
+        )
+
         return success_response(response.data,message="Updated successfully")
     
     def destroy(self, request, *args, **kwargs):
-        super().destroy(request, *args, **kwargs)
-        return success_response(message="Deleted successfully")
+       object_id = kwargs.get("pk")
+
+       LoggingService().create_audit_log(
+            request.user,
+            "DELETE",
+            self.get_queryset().model.__name__,
+            object_id
+        )
+
+       super().destroy(request,*args,**kwargs )
+
+
+       return success_response(message="Deleted successfully")

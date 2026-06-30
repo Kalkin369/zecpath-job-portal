@@ -1,7 +1,7 @@
 from django.contrib import admin
 from core.models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
                      AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation,InterviewSchedule,
-                     AvailabilitySlot,InterviewReminder,CandidateReport)
+                     AvailabilitySlot,InterviewReminder,CandidateReport,AuditTrail,ErrorLog,SecurityLog)
 
 
 #  User Admin
@@ -173,7 +173,36 @@ class InterviewReminderAdmin(admin.ModelAdmin):
 
 class CandidateReportAdmin(admin.ModelAdmin):
 
-    list_display = ('id','application','ats_score','ai_score')        
+    list_display = ('id','application','ats_score','ai_score')  
+
+@admin.register(AuditTrail)
+class AuditTrailAdmin(admin.ModelAdmin):
+
+    list_display = ('id','user','action','entity_type','entity_id','created_at')
+
+    search_fields = ('action','entity_type')
+
+    list_filter = ('action','entity_type')
+
+    ordering = ('-created_at',) 
+
+@admin.register(ErrorLog)
+class ErrorLogAdmin(admin.ModelAdmin):
+
+    list_display = ('id','source','created_at')
+
+    search_fields = ('source','message')
+
+    ordering = ('-created_at',)  
+
+@admin.register(SecurityLog)
+class SecurityLogAdmin(admin.ModelAdmin):
+
+    list_display = ('id','ip_address','event','created_at')
+
+    search_fields = ('ip_address','event')
+
+    ordering = ('-created_at',)               
 
 
 

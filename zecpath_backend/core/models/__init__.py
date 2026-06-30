@@ -18,3 +18,6 @@ from .interview_schedule import InterviewSchedule
 from .availability_slot import AvailabilitySlot
 from .interview_reminder import InterviewReminder
 from .candidate_report import CandidateReport
+from .audit_trail import AuditTrail
+from .error_log import ErrorLog
+from .security_log import SecurityLog

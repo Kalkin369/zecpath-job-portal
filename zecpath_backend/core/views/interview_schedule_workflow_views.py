@@ -17,6 +17,8 @@ from core.services.scheduling_engine_service import (
     SchedulingEngineService
 )
 
+from core.services.logging_service import (LoggingService)
+
 class ScheduleInterviewAPIView(
     APIView
 ):
@@ -54,7 +56,49 @@ class ScheduleInterviewAPIView(
                 )
             )
 
+            role = (
+                application.job.title
+            )
+
+            schedule = (
+                SchedulingEngineService()
+                .schedule_interview(
+                    application,
+                    role
+                )
+            )
+
+            if not schedule:
+
+                LoggingService().create_error_log(
+                    "ScheduleInterviewAPIView",
+                    f"No slot available for application {application_id}"
+                )
+
+                return Response(
+                    {
+                        "error":
+                        "No slot available"
+                    },
+                    status=400
+                )
+
+            serializer = (
+                InterviewScheduleSerializer(
+                    schedule
+                )
+            )
+
+            return Response(
+                serializer.data
+            )
+
         except Application.DoesNotExist:
+
+            LoggingService().create_error_log(
+                "ScheduleInterviewAPIView",
+                f"Application {application_id} not found"
+            )
 
             return Response(
                 {
@@ -64,37 +108,20 @@ class ScheduleInterviewAPIView(
                 status=404
             )
 
-        role = (
-            application.job.title
-        )
+        except Exception as e:
 
-        schedule = (
-            SchedulingEngineService()
-            .schedule_interview(
-                application,
-                role
+            LoggingService().create_error_log(
+                "ScheduleInterviewAPIView",
+                str(e)
             )
-        )
-
-        if not schedule:
 
             return Response(
                 {
                     "error":
-                    "No slot available"
+                    "Failed to schedule interview"
                 },
-                status=400
+                status=500
             )
-
-        serializer = (
-            InterviewScheduleSerializer(
-                schedule
-            )
-        )
-
-        return Response(
-            serializer.data
-        )
     
 class RescheduleInterviewAPIView(
     APIView

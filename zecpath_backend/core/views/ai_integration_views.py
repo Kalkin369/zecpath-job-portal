@@ -6,7 +6,7 @@ from core.services.llm_service import (LLMService)
 from core.services.tts_service import (TTSService)
 from core.services.stt_service import (STTService)
 from core.services.voice_call_service import (VoiceCallService)
-
+from core.services.logging_service import (LoggingService)
 
 class GenerateQuestionAPIView(APIView):
 
@@ -58,16 +58,67 @@ class SpeechToTextAPIView(APIView):
 
 
 
-class TriggerCallAPIView(APIView):
+from core.services.logging_service import (
+    LoggingService
+)
 
-    permission_classes = [IsAuthenticated]
 
-    def post(self,request):
+class TriggerCallAPIView(
+    APIView
+):
 
-        phone = request.data.get('phone')
+    permission_classes = [
+        IsAuthenticated
+    ]
 
-        service = VoiceCallService()
+    def post(
+        self,
+        request
+    ):
 
-        result = service.trigger_call(phone)
+        phone = (
+            request.data.get(
+                'phone'
+            )
+        )
 
-        return Response(result)    
+        if not phone:
+
+            return Response(
+                {
+                    "error":
+                    "phone is required"
+                },
+                status=400
+            )
+
+        try:
+
+            service = (
+                VoiceCallService()
+            )
+
+            result = (
+                service.trigger_call(
+                    phone
+                )
+            )
+
+            return Response(
+                result
+            )
+
+        except Exception as e:
+
+            LoggingService().create_error_log(
+                "TriggerCallAPIView",
+                f"Phone {phone}: {str(e)}"
+            )
+
+            return Response(
+                {
+                    "error":
+                    "Call trigger failed"
+                },
+                status=500
+            )

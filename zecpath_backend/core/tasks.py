@@ -6,6 +6,7 @@ from core.models import (InterviewSchedule)
 from core.services.reminder_service import ReminderService
 from django.utils import timezone
 from core.services.reminder_message_service import (ReminderMessageService)
+from core.services.logging_service import (LoggingService)
 
 @shared_task
 def test_task():
@@ -46,6 +47,8 @@ def send_interview_reminder_task():
 
     reminders = (
         ReminderService().get_pending_reminders())
+    
+    print(f"Found {reminders.count()} reminders")
 
     for reminder in reminders:
 
@@ -55,6 +58,7 @@ def send_interview_reminder_task():
 
             print(message)
 
+           
             reminder.status = 'sent'
 
             reminder.sent_at = (timezone.now())
@@ -64,6 +68,10 @@ def send_interview_reminder_task():
         except Exception as e:
 
             print(f"Reminder failed: {e}")
+
+            LoggingService().create_error_log(
+                "send_interview_reminder_task",f"Reminder {reminder.id}:{str(e)}"
+            )
 
             reminder.status = ('failed')
 

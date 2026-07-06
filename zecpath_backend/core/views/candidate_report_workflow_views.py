@@ -1,35 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import (
-    IsAuthenticated
-)
+from core.permissions import IsAdmin
+from core.models import (Application)
 
-from core.models import (
-    Application
-)
+from core.services.candidate_report_service import (CandidateReportService)
 
-from core.services.candidate_report_service import (
-    CandidateReportService
-)
-
-from core.serializers.candidate_report_serializer import (
-    CandidateReportSerializer
-)
+from core.serializers.candidate_report_serializer import (CandidateReportSerializer)
 
 from core.services.logging_service import (LoggingService)
 
-class GenerateReportAPIView(
-    APIView
-):
+class GenerateReportAPIView(APIView):
 
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAdmin]
 
-    def post(
-        self,
-        request
-    ):
+    def post(self,request):
 
         application_id = (
             request.data.get(
@@ -50,7 +34,7 @@ class GenerateReportAPIView(
         try:
 
             application = (
-                Application.objects.get(
+                Application.objects.select_related("candidate","job").get(
                     id=application_id
                 )
             )

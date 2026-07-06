@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from django.http import Http404
+from core.permissions import IsAdmin,IsEmployer
 from rest_framework import status
 
 from core.models.ai_answer import AIAnswer
@@ -14,61 +16,28 @@ from core.services.logging_service import (LoggingService)
 
 class EvaluateAnswerAPIView(APIView):
 
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAdmin]
 
-    def post(
-        self,
-        request
-    ):
+    def post(self,request):
 
-        answer_id = (
-            request.data.get(
-                'answer_id'
-            )
-        )
+        answer_id = (request.data.get('answer_id'))
 
         if not answer_id:
 
-            return Response(
-                {
-                    "error":
-                    "answer_id is required"
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error":"answer_id is required"},status=status.HTTP_400_BAD_REQUEST)
 
         try:
 
-            answer = (
-                AIAnswer.objects.get(
-                    id=answer_id
-                )
-            )
+            answer = get_object_or_404(AIAnswer,id=answer_id)
 
-            keywords = (
-                answer.question
-                .template
-                .expected_keywords
+            keywords = (answer.question.template.expected_keywords
                 if answer.question.template
                 else []
             )
 
-            keyword_score = (
-                AnswerEvaluationService()
-                .calculate_keyword_score(
-                    answer.answer_text,
-                    keywords
-                )
-            )
+            keyword_score = (AnswerEvaluationService().calculate_keyword_score(answer.answer_text,keywords))
 
-            total_score = (
-                AnswerEvaluationService()
-                .calculate_total_score(
-                    keyword_score
-                )
-            )
+            total_score = (AnswerEvaluationService().calculate_total_score(keyword_score))
 
             evaluation, created = (
                 AnswerEvaluation.objects
@@ -92,36 +61,24 @@ class EvaluateAnswerAPIView(APIView):
 
             if not created:
 
-                evaluation.keyword_score = (
-                    keyword_score
-                )
+                evaluation.keyword_score = (keyword_score)
 
-                evaluation.relevance_score = (
-                    keyword_score
-                )
+                evaluation.relevance_score = (keyword_score)
 
-                evaluation.completeness_score = (
-                    keyword_score
-                )
+                evaluation.completeness_score = (keyword_score)
 
-                evaluation.total_score = (
-                    total_score
-                )
+                evaluation.total_score = (total_score)
 
                 evaluation.save()
 
-            serializer = (
-                AnswerEvaluationSerializer(
-                    evaluation
-                )
-            )
+            serializer = (AnswerEvaluationSerializer(evaluation))
 
             return Response(
                 serializer.data,
                 status=status.HTTP_200_OK
             )
 
-        except AIAnswer.DoesNotExist:
+        except Http404:
 
             LoggingService().create_error_log(
                 "EvaluateAnswerAPIView",
@@ -153,13 +110,14 @@ class EvaluateAnswerAPIView(APIView):
 
 class AnswerEvaluationDetailAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmployer]
 
     def get(self,request,evaluation_id):
 
         try:
 
-            evaluation = (AnswerEvaluation.objects.get(id=evaluation_id))
+            evaluation = (AnswerEvaluation.objects.filter(answer__question__session__ai_call__application__job__employer=request.user.employer)
+                          .get(id=evaluation_id))
 
         except AnswerEvaluation.DoesNotExist:
 

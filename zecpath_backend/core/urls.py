@@ -24,6 +24,7 @@ from core.views.recruiter_analytics_views import (RecruiterAnalyticsAPIView)
 from core.views.security_log_views import (SecurityTestAPIView,SecurityLogViewSet)
 from core.views.audit_trail_views import (AuditTrailViewSet)
 from core.views.error_log_views import (ErrorLogViewSet)
+from core.views.security_report_views import (SecurityReportAPIView)
 
 
 
@@ -70,4 +71,5 @@ urlpatterns = [
     path('generate-report/',GenerateReportAPIView.as_view(),name='generate-report'),
     path('analytics/',RecruiterAnalyticsAPIView.as_view(),name='analytics'),
     path('security-test/',SecurityTestAPIView.as_view()),
+    path('security-report/',SecurityReportAPIView.as_view(),name='security-report')
 ]

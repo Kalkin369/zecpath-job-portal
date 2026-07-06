@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from core.permissions import IsAdmin
 
 from core.models.call_log import CallLog
 
@@ -11,6 +11,6 @@ class CallLogViewSet( viewsets.ReadOnlyModelViewSet):
 
     queryset = CallLog.objects.all()
 
-    serializer_class = (CallLogSerializer)
+    serializer_class = CallLogSerializer
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdmin]

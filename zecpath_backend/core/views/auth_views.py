@@ -13,15 +13,19 @@ class SignupAPI(APIView):
             serializer.save()
             return Response({"message": "User created successfully"}, status=201)
 
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
     
 
 from django.contrib.auth import authenticate
 from core.services.auth_service import generate_tokens
 from core.utils.response import success_response
+from core.throttles import LoginThrottle
 
 
 class LoginAPI(APIView):
+
+    throttle_classes = [LoginThrottle]
+
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -37,6 +41,7 @@ class LoginAPI(APIView):
     
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from core.services.logging_service import LoggingService
 
 
 class RefreshAPI(APIView):
@@ -63,7 +68,10 @@ class RefreshAPI(APIView):
                 }
             })
 
-        except Exception:
+        except Exception as e:
+
+            LoggingService().create_error_log("RefreshAPI",str(e))
+
             return Response({
                 "status": "fail",
                 "message": "Invalid or expired refresh token"

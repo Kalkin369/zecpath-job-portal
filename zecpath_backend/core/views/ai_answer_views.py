@@ -1,18 +1,17 @@
 from core.views.base_viewset import BaseViewSet
-from rest_framework.permissions import IsAuthenticated
 
-from core.models.ai_answer import (
-    AIAnswer
-)
+from core.permissions import IsCandidate
 
-from core.serializers.ai_answer_serializer import (
-    AIAnswerSerializer
-)
+from core.models.ai_answer import (AIAnswer)
+
+from core.serializers.ai_answer_serializer import (AIAnswerSerializer)
 
 class AIAnswerViewSet(BaseViewSet):
 
-    queryset = AIAnswer.objects.all()
+    serializer_class = AIAnswerSerializer
 
-    serializer_class = (AIAnswerSerializer)
+    permission_classes = [IsCandidate]
 
-    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+
+        return AIAnswer.objects.filter(question__session__candidate=self.request.user.candidate)

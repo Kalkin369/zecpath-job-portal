@@ -2,30 +2,25 @@ from rest_framework.views import APIView
 
 from rest_framework.response import Response
 
-from rest_framework.permissions import (IsAuthenticated)
+from core.permissions import IsEmployerOrAdmin
 
 from core.services.recruiter_analytics_service import (RecruiterAnalyticsService)
 
-from core.models.application import Application
-
 from django.core.cache import cache
 
-class RecruiterAnalyticsAPIView(
-    APIView
-):
+from core.services.logging_service import LoggingService
 
-    permission_classes = [
-        IsAuthenticated
-    ]
+class RecruiterAnalyticsAPIView(APIView):
 
-    def get(
-        self,
-        request
-    ):
+    permission_classes = [IsEmployerOrAdmin]
 
-        analytics_data = cache.get(
-            'recruiter_analytics'
-        )
+    def get(self,request):
+      
+      try:    
+
+        cache_key = (f"analytics_{request.user.id}")
+
+        analytics_data = cache.get(cache_key)
 
         if analytics_data:
 
@@ -33,30 +28,38 @@ class RecruiterAnalyticsAPIView(
                 analytics_data
             )
 
-        service = (
-            RecruiterAnalyticsService()
-        )
+        service = RecruiterAnalyticsService()
+
+        applications = (service.get_applications(request.user))
 
         analytics_data = {
 
             "total_applications":
-            Application.objects.count(),
+            applications.count(),
 
             "funnel":
-            service.get_funnel_metrics(),
+            service.get_funnel_metrics(
+                request.user
+            ),
 
             "conversion":
-            service.get_conversion_rates(),
+            service.get_conversion_rates(
+                request.user
+            ),
 
             "job_performance":
-            service.get_job_performance(),
+            service.get_job_performance(
+                request.user
+            ),
 
             "time_stats":
-            service.get_time_based_stats()
+            service.get_time_based_stats(
+                request.user
+            )
         }
 
         cache.set(
-            'recruiter_analytics',
+            cache_key,
             analytics_data,
             timeout=300
         )
@@ -64,3 +67,8 @@ class RecruiterAnalyticsAPIView(
         return Response(
             analytics_data
         )
+      except Exception as e:
+
+        LoggingService().create_error_log("RecruiterAnalyticsAPIView",str(e))
+
+        return Response({"success":False,"message":"Unable to load analytics"},status=500)

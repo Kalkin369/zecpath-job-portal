@@ -2,10 +2,10 @@ from core.views.base_viewset import BaseViewSet
 from core.models.job import Job
 from core.serializers.job_serializer import JobSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from core.permissions import IsEmployer
+from core.permissions import IsEmployer,IsCandidate
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
-
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -27,10 +27,14 @@ class JobViewSet(BaseViewSet):
             return [AllowAny()]
         elif self.action == 'create':
             return [IsAuthenticated(),IsEmployer()]
+        elif self.action == 'recommended':
+            return [IsAuthenticated(),IsCandidate()]
+        elif self.action == 'toggle_status':
+           return [IsAuthenticated(),IsEmployer()]
         return [IsAuthenticated()]
     
     def get_queryset(self):
-      queryset = Job.objects.select_related('employer')
+      queryset = self.queryset
 
     # 🔹 Query params (filters)
       min_salary = self.request.query_params.get('min_salary')
@@ -55,7 +59,7 @@ class JobViewSet(BaseViewSet):
      user = self.request.user
 
      if not hasattr(user, 'employer'):
-        from rest_framework.exceptions import PermissionDenied
+        
         raise PermissionDenied("Only employers can create jobs")
 
      serializer.save(employer=user.employer)
@@ -67,7 +71,7 @@ class JobViewSet(BaseViewSet):
 
         # Check ownership
         if not hasattr(request.user, 'employer') or job.employer != request.user.employer:
-            return Response({"error": "Not allowed"}, status=status.HTTP_403_FORBIDDEN)
+           raise PermissionDenied("You cannot modify this job")
 
         # Toggle status
         job.status = 'inactive' if job.status == 'active' else 'active'
@@ -84,7 +88,7 @@ class JobViewSet(BaseViewSet):
        if cached_jobs:
           return Response (cached_jobs)
        
-       jobs = self.queryset.filter(status='active').order_by('created_at')[:10]
+       jobs = self.queryset.filter(status='active').order_by('-created_at')[:10]
        serializer = self.get_serializer(jobs, many=True)
 
        cache.set('latest_jobs',serializer.data,timeout=60)
@@ -114,14 +118,12 @@ class JobViewSet(BaseViewSet):
 
         user = request.user
 
-        if not hasattr(user, 'candidate'):
-            return Response({"error": "Only candidates allowed"}, status=403)
 
         candidate = user.candidate
 
         skills = candidate.skills.split(',')
 
-        queryset = Job.objects.filter(status='active')
+        queryset = self.queryset.filter(status='active')
 
         matched_jobs = []
 

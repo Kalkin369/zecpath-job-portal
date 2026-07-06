@@ -1,41 +1,97 @@
-from core.models import (Application)
-from django.db.models import Count
-from django.utils import timezone
 from datetime import timedelta
 
+from django.db.models import Count
+from django.utils import timezone
+
+from core.models import Application
 
 
 class RecruiterAnalyticsService:
 
-    def get_funnel_metrics(self):
+    def get_applications(
+        self,
+        request_user
+    ):
 
-        applied = (Application.objects.filter(status='applied').count())
+        if hasattr(request_user, "employer"):
 
-        shortlisted = (Application.objects.filter(status='shortlisted').count())
+            return (
+                Application.objects.filter(
+                    job__employer=request_user.employer
+                )
+            )
 
-        interview = (Application.objects.filter(status='interview').count())
+        return (
+            Application.objects.all()
+        )
 
-        selected = (Application.objects.filter(status='selected').count())
+    def get_funnel_metrics(
+        self,
+        request_user
+    ):
 
-        rejected = (Application.objects.filter(status='rejected').count())
+        applications = (
+            self.get_applications(request_user)
+        )
 
         return {
-            "applied": applied,
-            "shortlisted": shortlisted,
-            "interview": interview,
-            "selected": selected,
-            "rejected": rejected
+
+            "applied":
+            applications.filter(
+                status='applied'
+            ).count(),
+
+            "shortlisted":
+            applications.filter(
+                status='shortlisted'
+            ).count(),
+
+            "interview":
+            applications.filter(
+                status='interview'
+            ).count(),
+
+            "selected":
+            applications.filter(
+                status='selected'
+            ).count(),
+
+            "rejected":
+            applications.filter(
+                status='rejected'
+            ).count()
         }
 
-    def get_conversion_rates(self):
+    def get_conversion_rates(
+        self,
+        request_user
+    ):
 
-        applied = (Application.objects.count())
+        applications = (
+            self.get_applications(request_user)
+        )
 
-        shortlisted = (Application.objects.filter(status='shortlisted').count())
+        applied = (
+            applications.count()
+        )
 
-        interview = (Application.objects.filter(status='interview').count())
+        shortlisted = (
+            applications.filter(
+                status='shortlisted'
+            ).count()
+        )
 
-        selected = (Application.objects.filter(status='selected').count())
+        interview = (
+            applications.filter(
+                status='interview'
+            ).count()
+        )
+
+        selected = (
+            applications.filter(
+                status='selected'
+            ).count()
+        )
 
         return {
 
@@ -63,30 +119,63 @@ class RecruiterAnalyticsService:
                 2
             ) if applied else 0
         }
-    
-    def get_job_performance(self):
+
+    def get_job_performance(
+        self,
+        request_user
+    ):
+
+        applications = (
+            self.get_applications(request_user)
+        )
 
         return list(
 
-            Application.objects
-            .values('job__title')
+            applications
 
-            .annotate(applications=Count('id'))
-            
-            .order_by('-applications')
+            .values(
+                'job__title'
+            )
+
+            .annotate(
+                applications=Count('id')
+            )
+
+            .order_by(
+                '-applications'
+            )
         )
-    
-    def get_time_based_stats(self):
 
-        now = (timezone.now())
+    def get_time_based_stats(
+        self,
+        request_user
+    ):
 
-        last_7_days = (now -timedelta(days=7))
+        applications = (
+            self.get_applications(request_user)
+        )
 
-        last_30_days = (now -timedelta(days=30))
+        now = (
+            timezone.now()
+        )
+
+        last_7_days = (
+            now - timedelta(days=7)
+        )
+
+        last_30_days = (
+            now - timedelta(days=30)
+        )
 
         return {
 
-            "last_7_days":Application.objects.filter(applied_at__gte=last_7_days).count(),
+            "last_7_days":
+            applications.filter(
+                applied_at__gte=last_7_days
+            ).count(),
 
-            "last_30_days":Application.objects.filter(applied_at__gte=last_30_days).count()
+            "last_30_days":
+            applications.filter(
+                applied_at__gte=last_30_days
+            ).count()
         }

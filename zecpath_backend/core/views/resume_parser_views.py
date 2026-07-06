@@ -1,18 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from core.permissions import IsCandidate
 
-from core.services.resume_parser_service import (
-    extract_resume_text
-)
-from core.services.resume_nlp_service import (
-    build_resume_json
-)
+from core.services.resume_parser_service import (extract_resume_text)
+from core.services.resume_nlp_service import (build_resume_json)
+from core.services.logging_service import LoggingService
 
 
 class ResumeParserAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCandidate]
 
     def post(self, request):
 
@@ -23,8 +20,16 @@ class ResumeParserAPIView(APIView):
                 "error": "Resume file required"
             }, status=400)
 
-        text = extract_resume_text(file)
-        structured_data = build_resume_json(text)
+        try:    
+
+            text = extract_resume_text(file)
+            structured_data = build_resume_json(text)
+
+        except Exception as e:
+
+            LoggingService().create_error_log("ResumeParserAPIView",str(e))  
+
+            return Response({"error":"Unable to parse resume"},status=400)
 
         return Response({
             "parsed_text": text,

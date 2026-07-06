@@ -2,14 +2,12 @@ from core.views.base_viewset import BaseViewSet
 from core.models.application import Application
 from core.serializers.application_serializer import ApplicationSerializer
 from rest_framework.permissions import IsAuthenticated
-from core.permissions import IsCandidate
-from rest_framework.exceptions import ValidationError
+from core.permissions import IsCandidate,IsEmployer,IsAdmin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from core.models.application_log import ApplicationLog
@@ -20,6 +18,8 @@ from core.services.notification_service import send_application_status_email
 from core.services.automation_service import auto_update_application_status
 
 from django.core.cache import cache
+from django.db import transaction
+from django.db.models import Count,Q
 
 
 class ApplicationViewSet(BaseViewSet):
@@ -31,10 +31,38 @@ class ApplicationViewSet(BaseViewSet):
     search_fields = ['candidate__user__email','job__title']
     ordering = ['applied_at']
 
+
     def get_permissions(self):
-        if self.action == 'create':
-            return [IsAuthenticated(), IsCandidate()]
-        return [IsAuthenticated()]
+
+        if self.action == "create":
+           permission_classes = [IsCandidate]
+
+        elif self.action in [
+            "update_status",
+            "job_applicants",
+            "analytics",
+            "status_summary",
+        ]:
+            permission_classes = [IsEmployer]
+
+        elif self.action == "timeline":
+            permission_classes = [IsCandidate]
+
+        elif self.action in [
+            "destroy",
+            "update",
+            "partial_update",
+        ]:
+            permission_classes = [IsAdmin]
+
+        else:
+            permission_classes = [IsAuthenticated]
+
+        return [
+            permission()
+            for permission in permission_classes
+        ]
+    
 
     def get_queryset(self):
        user = self.request.user
@@ -48,7 +76,8 @@ class ApplicationViewSet(BaseViewSet):
         return self.queryset.filter(job__employer=user.employer)
 
        return Application.objects.none()
-
+    
+    @transaction.atomic
     def perform_create(self, serializer):
         user = self.request.user
 
@@ -102,9 +131,6 @@ class ApplicationViewSet(BaseViewSet):
         application = self.get_object()
         user = request.user
 
-    #  Only employer allowed
-        if not hasattr(user, 'employer'):
-          raise PermissionDenied("Only employers can update status")
 
     #  Ownership check
         if application.job.employer != user.employer:
@@ -149,19 +175,16 @@ class ApplicationViewSet(BaseViewSet):
             new_status=new_status
         )
 
-        return Response({"message": "Status updated"}) 
+        return Response({"message": "Status updated","application_id":application.id,"status":application.status}) 
 
 #Applicants for a Job
     @action(detail=False, methods=['get'], url_path='job/(?P<job_id>[^/.]+)/applicants')
     def job_applicants(self, request, job_id=None):
         user = request.user
 
-        if not hasattr(user, 'employer'):
-          return Response({"error": "Only employers allowed"}, status=403)
-
         applications = self.queryset.filter(
             job_id=job_id,
-            job__employer=user.employer
+            job__employer=request.user.employer
         ).order_by('-ats_score')
 
         # pagination
@@ -181,12 +204,6 @@ class ApplicationViewSet(BaseViewSet):
 
         user = request.user
 
-        if not hasattr(user, 'employer'):
-            return Response(
-                {"error": "Not allowed"},
-                status=403
-            )
-
         # Unique cache per employer
         cache_key = f'analytics_{user.id}'
 
@@ -199,15 +216,23 @@ class ApplicationViewSet(BaseViewSet):
             job__employer=user.employer
         )
 
-        total = apps.count()
+        stats = apps.aggregate(
 
-        shortlisted = apps.filter(
-            status='shortlisted'
-        ).count()
+            total=Count("id"),
+
+            shortlisted=Count(
+                "id",
+                filter=Q(status="shortlisted")
+            )
+        )
+
+        total = stats["total"]
+
+        shortlisted = stats["shortlisted"]
 
         ratio = (
             shortlisted / total * 100
-        ) if total > 0 else 0
+        ) if total else 0
 
         data = {
             "total_applications": total,
@@ -232,12 +257,6 @@ class ApplicationViewSet(BaseViewSet):
 
         user = request.user
 
-        if not hasattr(user, 'employer'):
-            return Response(
-                {"error": "Not allowed"},
-                status=403
-            )
-
         # Unique cache per job
         cache_key = f'status_summary_{job_id}'
 
@@ -251,23 +270,30 @@ class ApplicationViewSet(BaseViewSet):
             job__employer=user.employer
         )
 
-        data = {
-            "applied": applications.filter(
-                status='applied'
-            ).count(),
+        summary = applications.aggregate(
 
-            "shortlisted": applications.filter(
-                status='shortlisted'
-            ).count(),
+            applied=Count(
+                "id",
+                filter=Q(status="applied")
+            ),
 
-            "rejected": applications.filter(
-                status='rejected'
-            ).count(),
+            shortlisted=Count(
+                "id",
+                filter=Q(status="shortlisted")
+            ),
 
-            "selected": applications.filter(
-                status='selected'
-            ).count(),
-        }
+            rejected=Count(
+                "id",
+                filter=Q(status="rejected")
+            ),
+
+            selected=Count(
+                "id",
+                filter=Q(status="selected")
+            )
+        )
+
+        data = summary
 
         # Cache for 2 minutes
         cache.set(

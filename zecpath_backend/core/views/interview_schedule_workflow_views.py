@@ -1,36 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import (
-    IsAuthenticated
-)
+from core.permissions import IsEmployer
 
-from core.models import (
-    Application,
-    InterviewSchedule
-)
+from core.models import (Application,InterviewSchedule)
 
-from core.serializers.interview_schedule_serializer import (
-    InterviewScheduleSerializer
-)
+from core.serializers.interview_schedule_serializer import (InterviewScheduleSerializer)
 
-from core.services.scheduling_engine_service import (
-    SchedulingEngineService
-)
+from core.services.scheduling_engine_service import (SchedulingEngineService)
 
 from core.services.logging_service import (LoggingService)
 
-class ScheduleInterviewAPIView(
-    APIView
-):
+class ScheduleInterviewAPIView(APIView):
 
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsEmployer]
 
-    def post(
-        self,
-        request
-    ):
+    def post(self,request):
 
         application_id = (
             request.data.get(
@@ -52,7 +36,7 @@ class ScheduleInterviewAPIView(
 
             application = (
                 Application.objects.get(
-                    id=application_id
+                    id=application_id,job__employer=request.user.employer
                 )
             )
 
@@ -82,6 +66,8 @@ class ScheduleInterviewAPIView(
                     },
                     status=400
                 )
+            
+            LoggingService().create_audit_log(request.user,"SCHEDULE_INTERVIEW","InterviewSchedule",schedule.id)
 
             serializer = (
                 InterviewScheduleSerializer(
@@ -123,13 +109,9 @@ class ScheduleInterviewAPIView(
                 status=500
             )
     
-class RescheduleInterviewAPIView(
-    APIView
-):
+class RescheduleInterviewAPIView(APIView):
 
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsEmployer]
 
     def patch(
         self,
@@ -141,7 +123,7 @@ class RescheduleInterviewAPIView(
 
             schedule = (
                 InterviewSchedule.objects.get(
-                    id=schedule_id
+                    id=schedule_id,application__job__employer=request.user.employer
                 )
             )
 
@@ -160,6 +142,8 @@ class RescheduleInterviewAPIView(
         )
 
         schedule.save()
+
+        LoggingService().create_audit_log(request.user,"RESCHEDULE_INTERVIEW","InterviewSchedule",schedule.id)
 
         return Response(
             {

@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from core.permissions import IsCandidate
 
 from core.services.question_engine_service import (QuestionEngineService)
 
@@ -9,7 +9,7 @@ from core.services.flow_manager_service import (FlowManagerService)
 
 class NextQuestionAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCandidate]
 
     def post(self,request):
 
@@ -17,8 +17,14 @@ class NextQuestionAPIView(APIView):
 
         if not role:
             return Response({"error":"role is required"},status=400)
+        
+        try:    
 
-        current_index = int(request.data.get('current_index',0))
+           current_index = int(request.data.get('current_index',0))
+
+        except ValueError:
+
+           return Response({"error":"Invalid current_index"},status=400)    
 
         questions = (QuestionEngineService().get_questions(role))
 
@@ -32,11 +38,14 @@ class NextQuestionAPIView(APIView):
     
 class SubmitAnswerAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCandidate]
 
     def post(self,request,):
 
         answer = request.data.get('answer')
+
+        if not answer:
+            return Response({"error":"answer is required"},status=400)
         
         role = request.data.get('role')
 
@@ -48,6 +57,6 @@ class SubmitAnswerAPIView(APIView):
 
         if next_question is None:
 
-            return Response({"message":"No follo-up question"})
+            return Response({"message":"No follow-up question"})
 
         return Response({"next_question":next_question["question"]})    

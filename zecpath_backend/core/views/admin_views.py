@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from core.views.base_viewset import BaseViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -18,7 +18,7 @@ from django.core.cache import cache
 
 
 # Admin Employer APIs
-class AdminEmployerViewSet(viewsets.ModelViewSet):
+class AdminEmployerViewSet(BaseViewSet):
 
     queryset = Employer.objects.all()
     serializer_class = EmployerSerializer
@@ -31,14 +31,14 @@ class AdminEmployerViewSet(viewsets.ModelViewSet):
         employer = self.get_object()
 
         employer.is_verified = True
-        employer.save()
+        employer.save(update_fields=["is_verified"])
 
         return Response({
             "message": "Employer approved"
         })
     
 # Admin User APIs
-class AdminUserViewSet(viewsets.ModelViewSet):
+class AdminUserViewSet(BaseViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -51,7 +51,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
 
         user.is_blocked = True
-        user.save()
+        user.save(update_fields=["is_blocked"])
 
         return Response({
             "message": "User blocked"
@@ -59,7 +59,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     
     
 # Admin Job APIs
-class AdminJobViewSet(viewsets.ModelViewSet):
+class AdminJobViewSet(BaseViewSet):
 
     queryset = Job.objects.all()
     serializer_class = JobSerializer
@@ -73,7 +73,7 @@ class AdminJobViewSet(viewsets.ModelViewSet):
         job = self.get_object()
 
         job.status = 'inactive'
-        job.save()
+        job.save(update_fields=["status"])
 
         return Response({
             "message": "Spam job removed"

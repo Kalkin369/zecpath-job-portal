@@ -1,5 +1,6 @@
 from core.views.base_viewset import BaseViewSet
 from core.models.application import Application
+from core.models.job import Job
 from core.serializers.application_serializer import ApplicationSerializer
 from rest_framework.permissions import IsAuthenticated
 from core.permissions import IsCandidate,IsEmployer,IsAdmin
@@ -9,6 +10,7 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from django.shortcuts import get_object_or_404
 
 from core.models.application_log import ApplicationLog
 from core.services.ats_service import calculate_ats_score
@@ -46,7 +48,7 @@ class ApplicationViewSet(BaseViewSet):
             permission_classes = [IsEmployer]
 
         elif self.action == "timeline":
-            permission_classes = [IsCandidate]
+            permission_classes = [IsAuthenticated]
 
         elif self.action in [
             "destroy",
@@ -180,23 +182,26 @@ class ApplicationViewSet(BaseViewSet):
 #Applicants for a Job
     @action(detail=False, methods=['get'], url_path='job/(?P<job_id>[^/.]+)/applicants')
     def job_applicants(self, request, job_id=None):
-        user = request.user
+
+        job = get_object_or_404(Job, id=job_id)
+
+        # Permission check
+        if job.employer != request.user.employer:
+            raise PermissionDenied("You can only view applicants for your own jobs.")
 
         applications = self.queryset.filter(
-            job_id=job_id,
-            job__employer=request.user.employer
+            job_id=job_id
         ).order_by('-ats_score')
 
-        # pagination
+        # Pagination
         page = self.paginate_queryset(applications)
 
         if page is not None:
-           serializer = self.get_serializer(page,many=True)
-           return self.get_paginated_response(serializer.data)
-
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(applications, many=True)
-        return Response(serializer.data)       
+        return Response(serializer.data)
     
 # Analytics APIs
     @action(detail=False, methods=['get'])
@@ -250,10 +255,9 @@ class ApplicationViewSet(BaseViewSet):
         return Response(data)
     
 #Status wise counts per job
-    @action(detail=True, methods=['get'])
-    def status_summary(self, request, pk=None):
+    @action(detail=False, methods=['get'],url_path=r"job/(?P<job_id>[^/.]+)/status-summary")
+    def status_summary(self, request, job_id=None):
 
-        job_id = pk
 
         user = request.user
 
@@ -267,7 +271,7 @@ class ApplicationViewSet(BaseViewSet):
 
         applications = Application.objects.filter(
             job_id=job_id,
-            job__employer=user.employer
+            job__employer=request.user.employer
         )
 
         summary = applications.aggregate(
@@ -304,17 +308,46 @@ class ApplicationViewSet(BaseViewSet):
 
         return Response(data)
 
-#Timeline view
+
+
+
+# Timeline View
     @action(detail=True, methods=['get'])
     def timeline(self, request, pk=None):
 
         application = self.get_object()
 
-        if ( 
-           not hasattr(request.user,'candidate') or application.candidate != request.user.candidate):
-           return Response({"error":"Not allowed"},status=403) 
+        # Candidate can view only their own application timeline
+        if hasattr(request.user, "candidate"):
 
-        logs = application.logs.all().order_by('changed_at')
+            if application.candidate != request.user.candidate:
+                return Response(
+                    {"error": "Not allowed"},
+                    status=403
+                )
+
+        # Employer can view timelines only for jobs they own
+        elif hasattr(request.user, "employer"):
+
+            if application.job.employer != request.user.employer:
+                return Response(
+                    {"error": "Not allowed"},
+                    status=403
+                )
+
+        # Any other user is denied
+        else:
+
+            return Response(
+                {"error": "Not allowed"},
+                status=403
+            )
+
+        logs = (
+            application.logs
+            .all()
+            .order_by("changed_at")
+        )
 
         data = [
             {
@@ -325,4 +358,4 @@ class ApplicationViewSet(BaseViewSet):
             for log in logs
         ]
 
-        return Response(data)   
+        return Response(data)

@@ -52,9 +52,14 @@ def calculate_education_score(
     required_education
 ):
 
+    if not candidate_education:
+        return 50
+
+    required_education = required_education.lower()
+
     for edu in candidate_education:
 
-        if required_education.lower() in edu:
+        if required_education in str(edu).lower():
             return 100
 
     return 50

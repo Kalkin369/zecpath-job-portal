@@ -1,7 +1,8 @@
 from django.contrib import admin
 from core.models import (User, Job, Application, Employer, Candidate, ApplicationLog,NotificationLog,AIInterviewSession,AIQuestion,
                      AIAnswer,AICall,CallLog,InterviewState,QuestionTemplate,SavedJob,AnswerEvaluation,InterviewSchedule,
-                     AvailabilitySlot,InterviewReminder,CandidateReport,AuditTrail,ErrorLog,SecurityLog)
+                     AvailabilitySlot,InterviewReminder,CandidateReport,AuditTrail,ErrorLog,SecurityLog,SubscriptionPlan,UserSubscription,
+                     PaymentTransaction,BillingHistory)
 
 
 #  User Admin
@@ -227,3 +228,7 @@ admin.site.register(InterviewSchedule,InterviewScheduleAdmin)
 admin.site.register(AvailabilitySlot,AvailabilitySlotAdmin)
 admin.site.register(InterviewReminder,InterviewReminderAdmin)
 admin.site.register(CandidateReport,CandidateReportAdmin)
+admin.site.register(SubscriptionPlan)
+admin.site.register(UserSubscription)
+admin.site.register(PaymentTransaction)
+admin.site.register(BillingHistory)

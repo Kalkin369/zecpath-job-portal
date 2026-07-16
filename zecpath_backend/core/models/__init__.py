@@ -21,3 +21,7 @@ from .candidate_report import CandidateReport
 from .audit_trail import AuditTrail
 from .error_log import ErrorLog
 from .security_log import SecurityLog
+from .subscription_plan import SubscriptionPlan
+from .user_subscription import UserSubscription
+from .payment_transaction import PaymentTransaction
+from .billing_history import BillingHistory

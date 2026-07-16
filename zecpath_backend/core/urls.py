@@ -25,6 +25,11 @@ from core.views.security_log_views import (SecurityTestAPIView,SecurityLogViewSe
 from core.views.audit_trail_views import (AuditTrailViewSet)
 from core.views.error_log_views import (ErrorLogViewSet)
 from core.views.security_report_views import (SecurityReportAPIView)
+from core.views.subscription_plan_views import (SubscriptionPlanViewSet)
+from core.views.user_subscription_views import (UserSubscriptionViewSet)
+from core.views.payment_transaction_views import (PaymentTransactionViewSet)
+from core.views.billing_history_views import (BillingHistoryViewSet)
+from core.views.subscription_access_views import (SubscriptionAccessAPIView)
 
 
 
@@ -52,6 +57,15 @@ router.register('security-logs',SecurityLogViewSet,basename='security-logs')
 router.register('audit-trails',AuditTrailViewSet,basename='audit-trails')
 router.register('error-logs',ErrorLogViewSet,basename='error-logs')
 
+router.register("subscription-plans",SubscriptionPlanViewSet,basename="subscription-plans")
+
+router.register("user-subscriptions",UserSubscriptionViewSet,basename="user-subscriptions")
+
+router.register("payment-transactions",PaymentTransactionViewSet,basename="payment-transactions")
+
+router.register("billing-history",BillingHistoryViewSet,basename="billing-history")
+
+
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/signup/', SignupAPI.as_view()),
@@ -71,5 +85,6 @@ urlpatterns = [
     path('generate-report/',GenerateReportAPIView.as_view(),name='generate-report'),
     path('analytics/',RecruiterAnalyticsAPIView.as_view(),name='analytics'),
     path('security-test/',SecurityTestAPIView.as_view()),
-    path('security-report/',SecurityReportAPIView.as_view(),name='security-report')
+    path('security-report/',SecurityReportAPIView.as_view(),name='security-report'),
+    path("subscription/access/",SubscriptionAccessAPIView.as_view())
 ]

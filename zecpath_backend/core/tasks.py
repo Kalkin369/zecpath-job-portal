@@ -1,8 +1,10 @@
 from celery import shared_task
 
 from core.models.application import Application
-from core.services.notification_service import (send_application_status_email)
-from core.models import (InterviewSchedule)
+from core.services.notification_service import (send_application_status_email,send_payment_success_email,
+                                                send_payment_failed_email,send_refund_processed_email,
+)
+from core.models import (InterviewSchedule,PaymentTransaction)
 from core.services.reminder_service import ReminderService
 from django.utils import timezone
 from core.services.reminder_message_service import (ReminderMessageService)
@@ -75,7 +77,42 @@ def send_interview_reminder_task():
 
             reminder.status = ('failed')
 
-            reminder.save()        
+            reminder.save() 
+
+@shared_task
+def send_payment_success_email_task(payment_id):
+
+    payment = PaymentTransaction.objects.select_related(
+        "subscription",
+        "subscription__plan",
+        "subscription__employer__user",
+    ).get(id=payment_id)
+
+    send_payment_success_email(payment)
+
+
+@shared_task
+def send_payment_failed_email_task(payment_id):
+
+    payment = PaymentTransaction.objects.select_related(
+        "subscription",
+        "subscription__plan",
+        "subscription__employer__user",
+    ).get(id=payment_id)
+
+    send_payment_failed_email(payment)
+
+
+@shared_task
+def send_refund_processed_email_task(payment_id):
+
+    payment = PaymentTransaction.objects.select_related(
+        "subscription",
+        "subscription__plan",
+        "subscription__employer__user",
+    ).get(id=payment_id)
+
+    send_refund_processed_email(payment)                   
 
 
 

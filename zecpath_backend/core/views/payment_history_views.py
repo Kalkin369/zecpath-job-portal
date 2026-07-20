@@ -1,0 +1,38 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from core.permissions import IsEmployer
+
+from core.services.payment_gateway_service import PaymentGatewayService
+from core.serializers.payment_history_serializer import PaymentHistorySerializer
+
+
+class PaymentHistoryAPIView(APIView):
+
+    permission_classes = [IsEmployer]
+
+    def get(
+        self,
+        request
+    ):
+
+        service = PaymentGatewayService()
+
+        payments = service.get_payment_history(
+            employer=request.user.employer
+        )
+
+        serializer = PaymentHistorySerializer(
+            payments,
+            many=True
+        )
+
+        return Response(
+            {
+                "success": True,
+                "count": len(serializer.data),
+                "data": serializer.data
+            },
+            status=status.HTTP_200_OK
+        )

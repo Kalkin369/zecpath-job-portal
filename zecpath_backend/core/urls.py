@@ -30,6 +30,13 @@ from core.views.user_subscription_views import (UserSubscriptionViewSet)
 from core.views.payment_transaction_views import (PaymentTransactionViewSet)
 from core.views.billing_history_views import (BillingHistoryViewSet)
 from core.views.subscription_access_views import (SubscriptionAccessAPIView)
+from core.views.create_payment_order_api_view import (CreatePaymentOrderAPIView)
+from core.views.verify_payment_api_view import (VerifyPaymentAPIView)
+from core.views.payment_test_view import (PaymentTestView)
+from core.views.payment_webhook_api_view import (PaymentWebhookAPIView)
+from core.views.payment_history_views import (PaymentHistoryAPIView)
+from core.views.payment_detail_views import (PaymentDetailAPIView)
+from core.views.refund_payment_views import (RefundPaymentAPIView)
 
 
 
@@ -86,5 +93,12 @@ urlpatterns = [
     path('analytics/',RecruiterAnalyticsAPIView.as_view(),name='analytics'),
     path('security-test/',SecurityTestAPIView.as_view()),
     path('security-report/',SecurityReportAPIView.as_view(),name='security-report'),
-    path("subscription/access/",SubscriptionAccessAPIView.as_view())
+    path("subscription/access/",SubscriptionAccessAPIView.as_view()),
+    path("payments/create-order/",CreatePaymentOrderAPIView.as_view(),name="create-payment-order"),
+    path("payments/verify/",VerifyPaymentAPIView.as_view(),name="verify-payment"),
+    path("payment-test/",PaymentTestView.as_view(),name="payment-test",),
+    path("payments/webhook/",PaymentWebhookAPIView.as_view(),name="payment-webhook"),
+    path("payments/history/",PaymentHistoryAPIView.as_view(),name="payment-history"),
+    path("payments/<int:payment_id>/",PaymentDetailAPIView.as_view(),name="payment-detail"),
+    path("payments/refund/",RefundPaymentAPIView.as_view(),name="payment-refund")
 ]

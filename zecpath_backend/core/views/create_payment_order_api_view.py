@@ -1,0 +1,53 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from core.permissions import IsEmployer
+
+from core.serializers.create_payment_order_serializer import (
+    CreatePaymentOrderSerializer
+)
+
+from core.services.payment_gateway_service import (
+    PaymentGatewayService
+)
+
+
+class CreatePaymentOrderAPIView(APIView):
+
+    permission_classes = [
+        IsEmployer
+    ]
+
+    def post(
+        self,
+        request
+    ):
+
+        serializer = CreatePaymentOrderSerializer(
+            data=request.data
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        result = PaymentGatewayService().create_payment_order(
+            employer=request.user.employer,
+            subscription_id=serializer.validated_data[
+                "subscription_id"
+            ]
+        )
+
+        order = result["order"]
+
+        return Response(
+            {
+                "message": "Payment order created successfully.",
+                "order_id": order["id"],
+                "amount": order["amount"],
+                "currency": order["currency"],
+                "status": order["status"]
+            },
+            status=status.HTTP_201_CREATED
+        )

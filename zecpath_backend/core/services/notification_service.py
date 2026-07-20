@@ -5,7 +5,7 @@ from core.models.notification_log import (
     NotificationLog
 )
 from core.services.email_templates import (
-    application_status_template
+    application_status_template,payment_success_template,payment_failed_template,refund_processed_template
 )
 
 
@@ -51,5 +51,111 @@ def send_application_status_email(application):
             subject=subject,
             message=message,
             status='failed',
+            error_message=str(e)
+        )
+
+def send_payment_success_email(payment):
+
+    employer = payment.subscription.employer.user
+
+    subject = "Payment Successful"
+
+    message = payment_success_template(payment)
+
+    try:
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [employer.email],
+            fail_silently=False
+        )
+
+        NotificationLog.objects.create(
+            user=employer,
+            subject=subject,
+            message=message,
+            status="success"
+        )
+
+    except Exception as e:
+
+        NotificationLog.objects.create(
+            user=employer,
+            subject=subject,
+            message=message,
+            status="failed",
+            error_message=str(e)
+        )
+
+def send_payment_failed_email(payment):
+
+    employer = payment.subscription.employer.user
+
+    subject = "Payment Failed"
+
+    message = payment_failed_template(payment)
+
+    try:
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [employer.email],
+            fail_silently=False
+        )
+
+        NotificationLog.objects.create(
+            user=employer,
+            subject=subject,
+            message=message,
+            status="success"
+        )
+
+    except Exception as e:
+
+        NotificationLog.objects.create(
+            user=employer,
+            subject=subject,
+            message=message,
+            status="failed",
+            error_message=str(e)
+        )
+
+
+def send_refund_processed_email(payment):
+
+    employer = payment.subscription.employer.user
+
+    subject = "Refund Processed"
+
+    message = refund_processed_template(payment)
+
+    try:
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [employer.email],
+            fail_silently=False
+        )
+
+        NotificationLog.objects.create(
+            user=employer,
+            subject=subject,
+            message=message,
+            status="success"
+        )
+
+    except Exception as e:
+
+        NotificationLog.objects.create(
+            user=employer,
+            subject=subject,
+            message=message,
+            status="failed",
             error_message=str(e)
         )

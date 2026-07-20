@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Test</title>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+
+<h2>Razorpay Payment Test</h2>
+
+<label>Employer JWT Token</label><br>
+
+<input
+    type="text"
+    id="token"
+    style="width:700px;"
+>
+
+<br><br>
+
+<button onclick="payNow()">
+    Pay Now
+</button>
+
+<script>
+    
+
+async function payNow() {
+
+    
+    // Replace with your JWT token
+    const token = document.getElementById("token").value;
+
+
+    // Replace with a valid subscription id
+    const subscriptionId = 1;
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/api/payments/create-order/",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+
+            body: JSON.stringify({
+                subscription_id: subscriptionId
+            })
+        }
+    );
+
+    const order = await response.json();
+
+    var options = {
+
+        key: "{{ razorpay_key_id }}",
+
+        amount: order.amount,
+
+        currency: order.currency,
+
+        name: "Zecpath",
+
+        description: "Subscription Payment",
+
+        order_id: order.order_id,
+
+        handler: async function (response) {
+
+            console.log(response);
+
+            const verify = await fetch(
+                "http://127.0.0.1:8000/api/payments/verify/",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+
+                    body: JSON.stringify({
+
+                        razorpay_order_id:
+                        response.razorpay_order_id,
+
+                        razorpay_payment_id:
+                        response.razorpay_payment_id,
+
+                        razorpay_signature:
+                        response.razorpay_signature
+
+                    })
+
+                }
+            );
+
+            const result = await verify.json();
+
+            alert(JSON.stringify(result));
+
+        }
+
+    };
+
+    var rzp = new Razorpay(options);
+
+    rzp.open();
+
+}
+
+</script>
+
+</body>
+</html>

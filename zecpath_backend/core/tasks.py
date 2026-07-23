@@ -9,6 +9,7 @@ from core.services.reminder_service import ReminderService
 from django.utils import timezone
 from core.services.reminder_message_service import (ReminderMessageService)
 from core.services.logging_service import (LoggingService)
+from core.services.subscription_service import (SubscriptionService)
 
 @shared_task
 def test_task():
@@ -114,6 +115,19 @@ def send_refund_processed_email_task(payment_id):
 
     send_refund_processed_email(payment)                   
 
+
+
+@shared_task
+def deactivate_expired_subscriptions():
+
+    updated_count = (
+        SubscriptionService()
+        .deactivate_all_expired_subscriptions()
+    )
+
+    return (
+        f"{updated_count} expired subscriptions deactivated."
+    )
 
 
 

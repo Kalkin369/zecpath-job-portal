@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.db.models import Count
+from django.db.models import Count,Q
 from django.utils import timezone
 
 from core.models import Application
@@ -179,3 +179,39 @@ class RecruiterAnalyticsService:
                 applied_at__gte=last_30_days
             ).count()
         }
+
+    
+
+    def get_job_status_summary(
+        self,
+        employer,
+        job_id
+    ):
+
+        applications = Application.objects.filter(
+            job_id=job_id,
+            job__employer=employer
+        )
+
+        return applications.aggregate(
+
+            applied=Count(
+                "id",
+                filter=Q(status="applied")
+            ),
+
+            shortlisted=Count(
+                "id",
+                filter=Q(status="shortlisted")
+            ),
+
+            rejected=Count(
+                "id",
+                filter=Q(status="rejected")
+            ),
+
+            selected=Count(
+                "id",
+                filter=Q(status="selected")
+            )
+        )

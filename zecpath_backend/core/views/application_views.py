@@ -3,7 +3,7 @@ from core.models.application import Application
 from core.models.job import Job
 from core.serializers.application_serializer import ApplicationSerializer
 from rest_framework.permissions import IsAuthenticated
-from core.permissions import IsCandidate,IsEmployer,IsAdmin
+from core.permissions import IsCandidate,IsEmployer,IsAdmin,CanViewCandidates,CanUseAnalytics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 
@@ -18,11 +18,10 @@ from core.services.resume_parser_service import extract_resume_text
 from core.services.resume_nlp_service import build_resume_json
 from core.services.notification_service import send_application_status_email
 from core.services.automation_service import auto_update_application_status
+from core.services.recruiter_analytics_service import (RecruiterAnalyticsService)
 
 from django.core.cache import cache
 from django.db import transaction
-from django.db.models import Count,Q
-
 
 class ApplicationViewSet(BaseViewSet):
     queryset = Application.objects.select_related('job','job__employer', 'candidate','candidate__user')
@@ -39,13 +38,14 @@ class ApplicationViewSet(BaseViewSet):
         if self.action == "create":
            permission_classes = [IsCandidate]
 
-        elif self.action in [
-            "update_status",
-            "job_applicants",
-            "analytics",
-            "status_summary",
-        ]:
-            permission_classes = [IsEmployer]
+        elif self.action == "job_applicants":
+           permission_classes =[IsEmployer]   
+
+        elif self.action == "status_summary":
+            permission_classes = [IsEmployer,CanUseAnalytics]
+
+        elif self.action == "update_status":
+           permission_classes=[IsEmployer]    
 
         elif self.action == "timeline":
             permission_classes = [IsAuthenticated]
@@ -203,111 +203,33 @@ class ApplicationViewSet(BaseViewSet):
         serializer = self.get_serializer(applications, many=True)
         return Response(serializer.data)
     
-# Analytics APIs
-    @action(detail=False, methods=['get'])
-    def analytics(self, request):
 
-        user = request.user
-
-        # Unique cache per employer
-        cache_key = f'analytics_{user.id}'
-
-        cached_data = cache.get(cache_key)
-
-        if cached_data:
-            return Response(cached_data)
-
-        apps = self.queryset.filter(
-            job__employer=user.employer
-        )
-
-        stats = apps.aggregate(
-
-            total=Count("id"),
-
-            shortlisted=Count(
-                "id",
-                filter=Q(status="shortlisted")
-            )
-        )
-
-        total = stats["total"]
-
-        shortlisted = stats["shortlisted"]
-
-        ratio = (
-            shortlisted / total * 100
-        ) if total else 0
-
-        data = {
-            "total_applications": total,
-            "shortlisted": shortlisted,
-            "shortlist_ratio": round(ratio, 2)
-        }
-
-        # Cache for 2 minutes
-        cache.set(
-            cache_key,
-            data,
-            timeout=120
-        )
-
-        return Response(data)
     
 #Status wise counts per job
-    @action(detail=False, methods=['get'],url_path=r"job/(?P<job_id>[^/.]+)/status-summary")
+    @action(detail=False,methods=["get"],url_path=r"job/(?P<job_id>[^/.]+)/status-summary")
     def status_summary(self, request, job_id=None):
 
-
-        user = request.user
-
-        # Unique cache per job
-        cache_key = f'status_summary_{job_id}'
+        cache_key = f"status_summary_{request.user.employer.id}_{job_id}"
 
         cached_data = cache.get(cache_key)
 
         if cached_data:
             return Response(cached_data)
 
-        applications = Application.objects.filter(
-            job_id=job_id,
-            job__employer=request.user.employer
+        service = RecruiterAnalyticsService()
+
+        summary = service.get_job_status_summary(
+            request.user.employer,
+            job_id
         )
 
-        summary = applications.aggregate(
-
-            applied=Count(
-                "id",
-                filter=Q(status="applied")
-            ),
-
-            shortlisted=Count(
-                "id",
-                filter=Q(status="shortlisted")
-            ),
-
-            rejected=Count(
-                "id",
-                filter=Q(status="rejected")
-            ),
-
-            selected=Count(
-                "id",
-                filter=Q(status="selected")
-            )
-        )
-
-        data = summary
-
-        # Cache for 2 minutes
         cache.set(
             cache_key,
-            data,
+            summary,
             timeout=120
         )
 
-        return Response(data)
-
+        return Response(summary)
 
 
 

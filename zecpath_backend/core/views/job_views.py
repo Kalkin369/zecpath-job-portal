@@ -2,7 +2,7 @@ from core.views.base_viewset import BaseViewSet
 from core.models.job import Job
 from core.serializers.job_serializer import JobSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from core.permissions import IsEmployer,IsCandidate
+from core.permissions import IsEmployer,IsCandidate,CanPostJob
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 from rest_framework.exceptions import PermissionDenied
@@ -23,15 +23,43 @@ class JobViewSet(BaseViewSet):
     ordering_fields = ['created_at','experience','salary_min']
 
     def get_permissions(self):
-        if self.action in ['list','retrieve','latest','featured']:
-            return [AllowAny()]
-        elif self.action == 'create':
-            return [IsAuthenticated(),IsEmployer()]
-        elif self.action == 'recommended':
-            return [IsAuthenticated(),IsCandidate()]
-        elif self.action == 'toggle_status':
-           return [IsAuthenticated(),IsEmployer()]
-        return [IsAuthenticated()]
+
+        if self.action in [
+            "list",
+            "retrieve",
+            "latest",
+            "featured"
+        ]:
+            permission_classes = [AllowAny]
+
+        elif self.action == "create":
+            permission_classes = [
+                IsAuthenticated,
+                IsEmployer,
+                CanPostJob,
+            ]
+
+        elif self.action == "recommended":
+            permission_classes = [
+                IsAuthenticated,
+                IsCandidate,
+            ]
+
+        elif self.action == "toggle_status":
+            permission_classes = [
+                IsAuthenticated,
+                IsEmployer,
+            ]
+
+        else:
+            permission_classes = [
+                IsAuthenticated
+            ]
+
+        return [
+            permission()
+            for permission in permission_classes
+        ]
     
     def get_queryset(self):
       queryset = self.queryset

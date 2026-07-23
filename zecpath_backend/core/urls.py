@@ -37,7 +37,7 @@ from core.views.payment_webhook_api_view import (PaymentWebhookAPIView)
 from core.views.payment_history_views import (PaymentHistoryAPIView)
 from core.views.payment_detail_views import (PaymentDetailAPIView)
 from core.views.refund_payment_views import (RefundPaymentAPIView)
-
+from core.views.subscription_access_views import (SubscriptionAccessAPIView)
 
 
 router = DefaultRouter()
@@ -100,5 +100,7 @@ urlpatterns = [
     path("payments/webhook/",PaymentWebhookAPIView.as_view(),name="payment-webhook"),
     path("payments/history/",PaymentHistoryAPIView.as_view(),name="payment-history"),
     path("payments/<int:payment_id>/",PaymentDetailAPIView.as_view(),name="payment-detail"),
-    path("payments/refund/",RefundPaymentAPIView.as_view(),name="payment-refund")
+    path("payments/refund/",RefundPaymentAPIView.as_view(),name="payment-refund"),
+    path("subscription/access/",SubscriptionAccessAPIView.as_view(),name="subscription-access"),
+    
 ]

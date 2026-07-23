@@ -203,7 +203,30 @@ class SecurityLogAdmin(admin.ModelAdmin):
 
     search_fields = ('ip_address','event')
 
-    ordering = ('-created_at',)               
+    ordering = ('-created_at',)  
+
+
+@admin.register(SubscriptionPlan)
+class SubscriptionPlanAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "name",
+        "price",
+        "duration_days",
+        "max_job_posts",
+        "max_candidate_access",
+        "ai_enabled",
+        "analytics_enabled",
+    )
+
+    list_filter = (
+        "ai_enabled",
+        "analytics_enabled",
+    )
+
+    search_fields = (
+        "name",
+    )                 
 
 
 
@@ -228,7 +251,6 @@ admin.site.register(InterviewSchedule,InterviewScheduleAdmin)
 admin.site.register(AvailabilitySlot,AvailabilitySlotAdmin)
 admin.site.register(InterviewReminder,InterviewReminderAdmin)
 admin.site.register(CandidateReport,CandidateReportAdmin)
-admin.site.register(SubscriptionPlan)
 admin.site.register(UserSubscription)
 admin.site.register(PaymentTransaction)
 admin.site.register(BillingHistory)

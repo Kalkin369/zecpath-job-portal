@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 
 from rest_framework.response import Response
 
-from core.permissions import IsEmployerOrAdmin
+from core.permissions import IsEmployerOrAdmin,CanUseAnalytics
 
 from core.services.recruiter_analytics_service import (RecruiterAnalyticsService)
 
@@ -12,7 +12,7 @@ from core.services.logging_service import LoggingService
 
 class RecruiterAnalyticsAPIView(APIView):
 
-    permission_classes = [IsEmployerOrAdmin]
+    permission_classes = [IsEmployerOrAdmin,CanUseAnalytics]
 
     def get(self,request):
       

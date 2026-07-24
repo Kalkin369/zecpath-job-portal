@@ -7,3 +7,7 @@ class InterviewThrottle(UserRateThrottle):
 class LoginThrottle(AnonRateThrottle):
 
     scope = "login"    
+
+class PremiumRecruiterThrottle(UserRateThrottle):
+
+    scope = "premium_recruiter"    

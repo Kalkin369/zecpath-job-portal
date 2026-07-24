@@ -151,7 +151,7 @@ REST_FRAMEWORK = {
 
     "DEFAULT_THROTTLE_CLASSES":["core.throttles.InterviewThrottle",],
 
-    "DEFAULT_THROTTLE_RATES":{"interview":"20/min","login":"5/min"}
+    "DEFAULT_THROTTLE_RATES":{"interview":"20/min","login":"5/min","premium_recruiter":"20/hour"}
 }                             
 
 

@@ -38,6 +38,7 @@ from core.views.payment_history_views import (PaymentHistoryAPIView)
 from core.views.payment_detail_views import (PaymentDetailAPIView)
 from core.views.refund_payment_views import (RefundPaymentAPIView)
 from core.views.subscription_access_views import (SubscriptionAccessAPIView)
+from core.views.premium_recruiter_views import (CandidateRankingAPIView,HiringEfficiencyAPIView,CandidatePredictionAPIView,PremiumDashboardAPIView)
 
 
 router = DefaultRouter()
@@ -102,5 +103,8 @@ urlpatterns = [
     path("payments/<int:payment_id>/",PaymentDetailAPIView.as_view(),name="payment-detail"),
     path("payments/refund/",RefundPaymentAPIView.as_view(),name="payment-refund"),
     path("subscription/access/",SubscriptionAccessAPIView.as_view(),name="subscription-access"),
-    
+    path("premium/candidate-ranking/",CandidateRankingAPIView.as_view(),name="candidate-ranking"),
+    path("premium/hiring-efficiency/",HiringEfficiencyAPIView.as_view(),name="hiring-efficiency"),
+    path("premium/candidate-predictions/",CandidatePredictionAPIView.as_view(),name="candidate-predictions"),
+    path("premium/dashboard/",PremiumDashboardAPIView.as_view(),name="premium-dashboard"),
 ]

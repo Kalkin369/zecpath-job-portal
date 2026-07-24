@@ -11,6 +11,13 @@ from core.throttles import PremiumRecruiterThrottle
 
 from django.core.cache import cache
 
+from core.serializers.candidate_ranking_serializer import (CandidateRankingSerializer)
+from core.serializers.hiring_efficiency_serializer import (HiringEfficiencySerializer)
+from core.serializers.candidate_prediction_serializer import (CandidatePredictionSerializer)
+from core.serializers.premium_dashboard_serializer import (PremiumDashboardSerializer)
+
+from rest_framework import status
+
 
 class CandidateRankingAPIView(APIView):
 
@@ -32,8 +39,10 @@ class CandidateRankingAPIView(APIView):
                 )
             )
 
+            serializer =CandidateRankingSerializer(instance=data, many=True)
+
             return Response(
-                data
+                serializer.data
             )
 
         except Exception as e:
@@ -48,7 +57,7 @@ class CandidateRankingAPIView(APIView):
                     "success": False,
                     "message": "Unable to generate candidate ranking."
                 },
-                status=500
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -72,8 +81,10 @@ class HiringEfficiencyAPIView(APIView):
                 )
             )
 
+            serializer = HiringEfficiencySerializer(instance=data)
+
             return Response(
-                data
+                serializer.data
             )
 
         except Exception as e:
@@ -88,7 +99,7 @@ class HiringEfficiencyAPIView(APIView):
                     "success": False,
                     "message": "Unable to generate hiring efficiency report."
                 },
-                status=500
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -112,8 +123,10 @@ class CandidatePredictionAPIView(APIView):
                 )
             )
 
+            serializer = CandidatePredictionSerializer(instance=data, many=True)
+
             return Response(
-                data
+                serializer.data
             )
 
         except Exception as e:
@@ -128,7 +141,7 @@ class CandidatePredictionAPIView(APIView):
                     "success": False,
                     "message": "Unable to generate prediction report."
                 },
-                status=500
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -156,27 +169,25 @@ class PremiumDashboardAPIView(APIView):
                 cache_key
             )
 
-            if dashboard_data:
+            if  dashboard_data is None:
 
-                return Response(
-                    dashboard_data
+                dashboard_data = (
+                    PremiumRecruiterService()
+                    .get_dashboard(
+                        request.user.employer
+                    )
                 )
 
-            dashboard_data = (
-                PremiumRecruiterService()
-                .get_dashboard(
-                    request.user.employer
+                cache.set(
+                    cache_key,
+                    dashboard_data,
+                    timeout=300
                 )
-            )
 
-            cache.set(
-                cache_key,
-                dashboard_data,
-                timeout=300
-            )
+            serializer = PremiumDashboardSerializer(instance=dashboard_data)
 
             return Response(
-                dashboard_data
+                serializer.data
             )
 
         except Exception as e:
@@ -191,5 +202,5 @@ class PremiumDashboardAPIView(APIView):
                     "success": False,
                     "message": "Unable to load premium dashboard."
                 },
-                status=500
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

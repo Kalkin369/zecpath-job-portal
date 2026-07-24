@@ -39,7 +39,7 @@ from core.views.payment_detail_views import (PaymentDetailAPIView)
 from core.views.refund_payment_views import (RefundPaymentAPIView)
 from core.views.subscription_access_views import (SubscriptionAccessAPIView)
 from core.views.premium_recruiter_views import (CandidateRankingAPIView,HiringEfficiencyAPIView,CandidatePredictionAPIView,PremiumDashboardAPIView)
-
+from core.views.admin_finance_views import (FinanceDashboardAPIView,DailyRevenueAPIView,MonthlyRevenueAPIView,PlanRevenueAPIView,PaymentFailureAPIView)
 
 router = DefaultRouter()
 router.register('users', UserViewSet)
@@ -107,4 +107,14 @@ urlpatterns = [
     path("premium/hiring-efficiency/",HiringEfficiencyAPIView.as_view(),name="hiring-efficiency"),
     path("premium/candidate-predictions/",CandidatePredictionAPIView.as_view(),name="candidate-predictions"),
     path("premium/dashboard/",PremiumDashboardAPIView.as_view(),name="premium-dashboard"),
+    
+    path("admin/finance/dashboard/",FinanceDashboardAPIView.as_view(),name="finance-dashboard"),
+
+    path("admin/finance/daily-revenue/",DailyRevenueAPIView.as_view(),name="daily-revenue"),
+
+    path("admin/finance/monthly-revenue/",MonthlyRevenueAPIView.as_view(),name="monthly-revenue"),
+
+    path("admin/finance/plan-revenue/",PlanRevenueAPIView.as_view(),name="plan-revenue"),
+
+    path("admin/finance/payment-failures/",PaymentFailureAPIView.as_view(),name="payment-failures"),
 ]

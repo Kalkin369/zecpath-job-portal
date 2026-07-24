@@ -4,9 +4,9 @@ from rest_framework.response import Response
 
 from core.permissions import IsEmployer,HasActiveSubscription
 
-from core.services.subscription_service import (
-    SubscriptionService
-)
+from core.services.subscription_service import (SubscriptionService)
+
+from core.serializers.subscription_access_serializer import (SubscriptionAccessSerializer)
 
 
 class SubscriptionAccessAPIView(APIView):
@@ -22,4 +22,6 @@ class SubscriptionAccessAPIView(APIView):
 
         data = SubscriptionService().get_subscription_access(employer)
 
-        return Response(data)
+        serializer = SubscriptionAccessSerializer(instance=data)
+
+        return Response(serializer.data)

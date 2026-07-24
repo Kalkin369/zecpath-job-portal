@@ -9,6 +9,7 @@ class PaymentTransaction(models.Model):
         ("pending", "Pending"),
         ("success", "Success"),
         ("failed", "Failed"),
+        ("refund_pending","Refund Pending"),
         ("refunded", "Refunded"),
     ]
 

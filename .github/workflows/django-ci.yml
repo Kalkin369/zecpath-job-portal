@@ -1,4 +1,4 @@
-name: Django CI
+name: Django CI/CD
 
 on:
   push:
@@ -66,3 +66,36 @@ jobs:
         run: |
           cd zecpath_backend
           python manage.py check
+
+  deploy:
+    needs: build
+
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ${{ secrets.PROJECT_PATH }}
+
+            git fetch origin
+            git checkout dev
+            git pull origin dev
+
+            source /venv/bin/activate
+
+            pip install -r requirement.txt
+
+            python manage.py migrate
+
+            python manage.py collectstatic --noinput
+
+            sudo systemctl restart gunicorn
+
+            sudo systemctl status gunicorn --no-pager

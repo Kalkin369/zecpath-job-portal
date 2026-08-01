@@ -19,6 +19,7 @@ from core.services.resume_nlp_service import build_resume_json
 from core.services.notification_service import send_application_status_email
 from core.services.automation_service import auto_update_application_status
 from core.services.recruiter_analytics_service import (RecruiterAnalyticsService)
+from core.services.s3_service import S3Service
 
 from django.core.cache import cache
 from django.db import transaction
@@ -49,6 +50,9 @@ class ApplicationViewSet(BaseViewSet):
 
         elif self.action == "timeline":
             permission_classes = [IsAuthenticated]
+
+        elif self.action == "download_resume":
+           permission_classes =[IsAuthenticated]    
 
         elif self.action in [
             "destroy",
@@ -281,3 +285,33 @@ class ApplicationViewSet(BaseViewSet):
         ]
 
         return Response(data)
+
+
+    @action(detail=True, methods=["get"], url_path="download-resume")
+    def download_resume(self, request, pk=None):
+
+        application = self.get_object()
+
+        # Candidate can download only their own resume
+        if hasattr(request.user, "candidate"):
+            if application.candidate != request.user.candidate:
+                raise PermissionDenied("You are not allowed to access this resume.")
+
+        # Employer can download resumes only for jobs they own
+        elif hasattr(request.user, "employer"):
+            if application.job.employer != request.user.employer:
+                raise PermissionDenied("You are not allowed to access this resume.")
+
+        else:
+            raise PermissionDenied("Not allowed.")
+
+        if not application.resume:
+            raise ValidationError("Resume not found.")
+
+        url = S3Service.generate_presigned_url(
+            application.resume.name
+        )
+
+        return Response({
+            "download_url": url
+        })

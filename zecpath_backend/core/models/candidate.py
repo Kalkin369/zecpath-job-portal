@@ -16,12 +16,14 @@ class Candidate(models.Model):
     def __str__(self):
         return self.user.email
     
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
         try:
             old = Candidate.objects.get(pk=self.pk)
+
             if old.resume and old.resume != self.resume:
-                if os.path.isfile(old.resume.path):
-                   os.remove(old.resume.path)
+                old.resume.delete(save=False)
+
         except Candidate.DoesNotExist:
             pass
-        super().save(*args,**kwargs)           
+
+        super().save(*args, **kwargs)

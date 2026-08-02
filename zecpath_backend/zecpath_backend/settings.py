@@ -87,6 +87,7 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
+        "CONN_MAX_AGE":300,
     }
 }
 
@@ -180,7 +181,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CACHES = {
-    'default':{'BACKEND':'django.core.cache.backends.locmem.LocMemCache', }
+    'default':{'BACKEND':'django.core.cache.backends.redis.RedisCache',"LOCATION":"redis://127.0.0.1:6379/1", }
 }
 
 CELERY_BROKER_URL =('redis://localhost:6379/0')

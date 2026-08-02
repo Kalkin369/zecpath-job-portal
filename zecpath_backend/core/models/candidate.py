@@ -9,7 +9,7 @@ class Candidate(models.Model):
     phone = models.CharField(max_length=15)
     qualification = models.CharField(max_length=100)
     skills = models.TextField(blank=True)
-    experience = models.IntegerField(default=0)
+    experience = models.IntegerField(default=0,db_index=True)
     expected_salary = models.IntegerField(null=True,blank=True)
     resume = models.FileField(upload_to=resume_upload_path,validators=[validate_resume],null=True,blank=True)
 

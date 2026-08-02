@@ -32,7 +32,7 @@ class User(AbstractUser):
     full_name = models.CharField(max_length=100,null=True,blank=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15,blank=True,null=True)
-    role = models.CharField(max_length=20,choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20,choices=ROLE_CHOICES,db_index=True)
     is_verified = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)

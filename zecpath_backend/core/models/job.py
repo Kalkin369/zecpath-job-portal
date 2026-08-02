@@ -28,13 +28,14 @@ class Job(models.Model):
     location = models.CharField(max_length=255)
     job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
 
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active',db_index=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [models.Index(fields=["status","-created_at"]),]
 
     def __str__(self):
         return self.title

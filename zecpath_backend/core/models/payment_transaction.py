@@ -36,12 +36,12 @@ class PaymentTransaction(models.Model):
 
     gateway_order_id = models.CharField(
         max_length=200,
-        blank=True
+        blank=True,db_index=True
     )
 
     gateway_payment_id = models.CharField(
         max_length=200,
-        blank=True
+        blank=True,db_index=True
     )
 
     payment_signature = models.TextField(
@@ -64,7 +64,7 @@ class PaymentTransaction(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default="pending"
+        default="pending",db_index=True
     )
 
     created_at = models.DateTimeField(

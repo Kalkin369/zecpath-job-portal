@@ -12,7 +12,7 @@ class UserSubscription(models.Model):
 
     end_date = models.DateField()
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True,db_index=True)
 
     def __str__(self):
 

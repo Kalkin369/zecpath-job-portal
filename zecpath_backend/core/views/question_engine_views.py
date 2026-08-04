@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from core.permissions import IsCandidate
-
+from core.throttles import InterviewThrottle
 from core.services.question_engine_service import (QuestionEngineService)
 
 from core.services.flow_manager_service import (FlowManagerService)
@@ -10,6 +10,8 @@ from core.services.flow_manager_service import (FlowManagerService)
 class NextQuestionAPIView(APIView):
 
     permission_classes = [IsCandidate]
+
+    throttle_classes =[InterviewThrottle]
 
     def post(self,request):
 

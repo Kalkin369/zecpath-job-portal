@@ -1,5 +1,6 @@
 from core.views.base_viewset import BaseViewSet
 from core.permissions import IsCandidate, IsEmployer
+from core.throttles import InterviewThrottle
 from core.models.ai_interview_session import AIInterviewSession
 from core.serializers.ai_interview_session_serializer import (
     AIInterviewSessionSerializer
@@ -11,6 +12,8 @@ class AIInterviewSessionViewSet(BaseViewSet):
     queryset = AIInterviewSession.objects.all()
 
     serializer_class = AIInterviewSessionSerializer
+
+    throttle_classes = [InterviewThrottle]
 
     def get_permissions(self):
 

@@ -40,6 +40,7 @@ from core.views.refund_payment_views import (RefundPaymentAPIView)
 from core.views.subscription_access_views import (SubscriptionAccessAPIView)
 from core.views.premium_recruiter_views import (CandidateRankingAPIView,HiringEfficiencyAPIView,CandidatePredictionAPIView,PremiumDashboardAPIView)
 from core.views.admin_finance_views import (FinanceDashboardAPIView,DailyRevenueAPIView,MonthlyRevenueAPIView,PlanRevenueAPIView,PaymentFailureAPIView)
+from core.views.logout_views import (LogoutAPI)
 
 router = DefaultRouter()
 router.register('users', UserViewSet)
@@ -117,4 +118,6 @@ urlpatterns = [
     path("admin/finance/plan-revenue/",PlanRevenueAPIView.as_view(),name="plan-revenue"),
 
     path("admin/finance/payment-failures/",PaymentFailureAPIView.as_view(),name="payment-failures"),
+
+    path("logout/",LogoutAPI.as_view(),name="logout",),
 ]

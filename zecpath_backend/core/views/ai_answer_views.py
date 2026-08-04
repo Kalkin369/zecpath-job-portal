@@ -1,5 +1,6 @@
 from core.views.base_viewset import BaseViewSet
 from core.permissions import IsCandidate
+from core.throttles import InterviewThrottle
 from core.models.ai_answer import AIAnswer
 from core.serializers.ai_answer_serializer import AIAnswerSerializer
 
@@ -11,6 +12,8 @@ class AIAnswerViewSet(BaseViewSet):
     serializer_class = AIAnswerSerializer
 
     permission_classes = [IsCandidate]
+
+    throttle_classes = [InterviewThrottle]
 
     def get_queryset(self):
 

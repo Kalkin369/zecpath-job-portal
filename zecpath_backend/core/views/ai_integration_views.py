@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from core.permissions import IsAdmin
+from core.throttles import InterviewThrottle
 from core.services.llm_service import (LLMService)
 from core.services.tts_service import (TTSService)
 from core.services.stt_service import (STTService)
@@ -11,6 +12,8 @@ from core.services.logging_service import (LoggingService)
 class GenerateQuestionAPIView(APIView):
 
     permission_classes = [IsAdmin]
+
+    throttle_classes = [InterviewThrottle]
 
     def post(self,request):
 
@@ -32,6 +35,8 @@ class TextToSpeechAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    throttle_classes = [InterviewThrottle]
+
     def post(self,request):
 
         text = request.data.get('text')
@@ -52,6 +57,8 @@ class TextToSpeechAPIView(APIView):
 class SpeechToTextAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
+
+    throttle_classes = [InterviewThrottle]
 
     def post(self,request):
 

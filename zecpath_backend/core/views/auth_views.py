@@ -33,11 +33,29 @@ class LoginAPI(APIView):
         user = authenticate(username=email, password=password)
 
         if user is None:
-            return Response({"error": "Invalid credentials"}, status=401)
+            return Response(
+                {"error": "Invalid credentials"},
+                status=401
+            )
+
+        if user.is_blocked:
+            return Response(
+                {"error": "Your account has been blocked."},
+                status=403
+            )
+
+        if not user.is_staff and not user.is_verified:
+            return Response(
+                {"error": "Please verify your account first."},
+                status=403
+            )
 
         tokens = generate_tokens(user)
 
-        return success_response(tokens, "Login successful")
+        return success_response(
+            tokens,
+            "Login successful"
+        )
     
 
 from rest_framework_simplejwt.tokens import RefreshToken

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'core.apps.CoreConfig',
     'django_filters',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +141,8 @@ from datetime import timedelta
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS":True,
+    "BLACKLIST_AFTER_ROTATION":True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
@@ -156,7 +159,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_FILTER_BACKENDS':['django_filters.rest_framework.DjangoFilterBackend'],
 
-    "DEFAULT_THROTTLE_CLASSES":["core.throttles.InterviewThrottle",],
+
 
     "DEFAULT_THROTTLE_RATES":{"interview":"20/min","login":"5/min","premium_recruiter":"20/hour"}
 }                             

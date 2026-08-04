@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from core.permissions import IsAdmin,IsEmployer
+from core.throttles import InterviewThrottle
 from rest_framework import status
 
 from core.models.ai_answer import AIAnswer
@@ -17,6 +18,8 @@ from core.services.logging_service import (LoggingService)
 class EvaluateAnswerAPIView(APIView):
 
     permission_classes = [IsAdmin]
+
+    throttle_classes = [InterviewThrottle]
 
     def post(self,request):
 
@@ -111,6 +114,8 @@ class EvaluateAnswerAPIView(APIView):
 class AnswerEvaluationDetailAPIView(APIView):
 
     permission_classes = [IsEmployer]
+
+    throttle_classes = [InterviewThrottle]
 
     def get(self,request,evaluation_id):
 

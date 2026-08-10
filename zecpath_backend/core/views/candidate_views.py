@@ -5,6 +5,69 @@ from core.permissions import IsCandidate
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiResponse,
+)
+
+@extend_schema(
+    tags=["Candidates"]
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Candidates",
+        description="Retrieve the authenticated candidate profile.",
+        responses={
+            200: CandidateSerializer(many=True),
+        },
+    ),
+
+    retrieve=extend_schema(
+        summary="Retrieve Candidate",
+        description="Retrieve a candidate profile.",
+        responses={
+            200: CandidateSerializer,
+            404: OpenApiResponse(description="Candidate not found"),
+        },
+    ),
+
+    create=extend_schema(
+        summary="Create Candidate Profile",
+        description="Create a candidate profile for the authenticated user.",
+        request=CandidateSerializer,
+        responses={
+            201: CandidateSerializer,
+            400: OpenApiResponse(description="Validation error"),
+        },
+    ),
+
+    update=extend_schema(
+        summary="Update Candidate Profile",
+        description="Update the authenticated candidate profile.",
+        request=CandidateSerializer,
+        responses={
+            200: CandidateSerializer,
+        },
+    ),
+
+    partial_update=extend_schema(
+        summary="Partially Update Candidate Profile",
+        description="Update selected fields of the authenticated candidate profile.",
+        request=CandidateSerializer,
+        responses={
+            200: CandidateSerializer,
+        },
+    ),
+
+    destroy=extend_schema(
+        summary="Delete Candidate Profile",
+        description="Delete the authenticated candidate profile.",
+        responses={
+            204: OpenApiResponse(description="Candidate deleted"),
+        },
+    ),
+)
 
 class CandidateViewSet(BaseViewSet):
     queryset = Candidate.objects.all()

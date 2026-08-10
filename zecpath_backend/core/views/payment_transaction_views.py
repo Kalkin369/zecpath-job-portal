@@ -10,6 +10,48 @@ from core.views.base_viewset import BaseViewSet
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema,extend_schema_view,OpenApiResponse
+
+@extend_schema(
+    tags=["Payment Transactions"]
+)
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="Get Payment Transactions",
+        description="Retrieve all payment transactions. Admin only.",
+        responses={200: PaymentTransactionSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        summary="Get Payment Transaction Detail",
+        description="Retrieve a payment transaction by ID.",
+        responses={200: PaymentTransactionSerializer},
+    ),
+    create=extend_schema(
+        summary="Create Payment Transaction",
+        description="Create a payment transaction.",
+        request=PaymentTransactionSerializer,
+        responses={201: PaymentTransactionSerializer},
+    ),
+    update=extend_schema(
+        summary="Update Payment Transaction",
+        request=PaymentTransactionSerializer,
+        responses={200: PaymentTransactionSerializer},
+    ),
+    partial_update=extend_schema(
+        summary="Partially Update Payment Transaction",
+        request=PaymentTransactionSerializer,
+        responses={200: PaymentTransactionSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete Payment Transaction",
+        responses={
+            204: OpenApiResponse(
+                description="Deleted successfully."
+            )
+        },
+    ),
+)
 
 
 class PaymentTransactionViewSet(BaseViewSet):
@@ -33,7 +75,13 @@ class PaymentTransactionViewSet(BaseViewSet):
 
         return [permission() for permission in permission_classes]
     
-
+    @extend_schema(
+    summary="My Transactions",
+    description="Retrieve payment transactions for the authenticated employer.",
+    responses={
+        200: PaymentTransactionSerializer(many=True),
+    },
+    )
     
 
     @action(detail=False, methods=["get"])

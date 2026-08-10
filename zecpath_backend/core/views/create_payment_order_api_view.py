@@ -12,6 +12,26 @@ from core.services.payment_gateway_service import (
     PaymentGatewayService
 )
 
+from drf_spectacular.utils import extend_schema,OpenApiResponse
+
+@extend_schema(
+    tags=["Payment Gateway"],
+    summary="Create Payment Order",
+    description="Create a Razorpay order for a subscription purchase.",
+    request=CreatePaymentOrderSerializer,
+    responses={
+        201: OpenApiResponse(
+            description="Payment order created successfully."
+        ),
+        400: OpenApiResponse(
+            description="Invalid subscription."
+        ),
+        403: OpenApiResponse(
+            description="Employer authentication required."
+        ),
+    },
+)
+
 
 class CreatePaymentOrderAPIView(APIView):
 

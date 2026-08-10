@@ -13,6 +13,20 @@ from core.services.answer_evaluation_service import (AnswerEvaluationService)
 
 from core.serializers.answer_evaluation_serializer import (AnswerEvaluationSerializer)
 from core.services.logging_service import (LoggingService)
+from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer
+from rest_framework import serializers
+
+@extend_schema(
+    tags=["AI Evaluation"],
+    summary="Evaluate Candidate Answer",
+    description="Evaluate a candidate's interview answer and calculate scores.",
+    request=inline_serializer(name="EvaluateAnswerRequest",fields={"answer_id":serializers.IntegerField()}),
+    responses={
+        200: AnswerEvaluationSerializer,
+        404: OpenApiResponse(description="Answer not found."),
+        500: OpenApiResponse(description="Evaluation failed."),
+    },
+)
 
 
 class EvaluateAnswerAPIView(APIView):
@@ -110,6 +124,16 @@ class EvaluateAnswerAPIView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+@extend_schema(
+    tags=["AI Evaluation"],
+    summary="Evaluation Detail",
+    description="Retrieve the evaluation details of a candidate's answer.",
+    responses={
+        200: AnswerEvaluationSerializer,
+        404: OpenApiResponse(description="Evaluation not found."),
+    },
+)
 
 class AnswerEvaluationDetailAPIView(APIView):
 

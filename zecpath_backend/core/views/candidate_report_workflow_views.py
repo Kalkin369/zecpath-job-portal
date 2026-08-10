@@ -9,6 +9,32 @@ from core.serializers.candidate_report_serializer import (CandidateReportSeriali
 
 from core.services.logging_service import (LoggingService)
 
+from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer
+from rest_framework import serializers
+
+@extend_schema(
+    tags=["Candidate Reports"],
+    summary="Generate Candidate Report",
+    description=(
+        "Generate a complete interview report for a candidate "
+        "based on their application, AI interview, answers, and evaluations."
+    ),
+    request=inline_serializer(name="GenerateReportRequest",fields={"application_id":serializers.IntegerField()}),
+    responses={
+        200: CandidateReportSerializer,
+        400: OpenApiResponse(
+            description="Application ID is required."
+        ),
+        404: OpenApiResponse(
+            description="Application not found."
+        ),
+        500: OpenApiResponse(
+            description="Failed to generate report."
+        ),
+    },
+)
+
+
 class GenerateReportAPIView(APIView):
 
     permission_classes = [IsAdmin]

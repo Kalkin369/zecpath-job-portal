@@ -24,6 +24,62 @@ from core.services.s3_service import S3Service
 from django.core.cache import cache
 from django.db import transaction
 
+from drf_spectacular.utils import (extend_schema,extend_schema_view,OpenApiResponse,)
+
+@extend_schema(
+    tags=["Applications"]
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Applications",
+        description="Retrieve applications visible to the authenticated user. Candidates see their own applications, while employers see applications for their jobs.",
+        responses={200: ApplicationSerializer(many=True)},
+    ),
+
+    retrieve=extend_schema(
+        summary="Retrieve Application",
+        description="Retrieve a single application.",
+        responses={
+            200: ApplicationSerializer,
+            404: OpenApiResponse(description="Application not found"),
+        },
+    ),
+
+    create=extend_schema(
+        summary="Apply for Job",
+        description="Candidate submits an application. ATS score is calculated automatically from the uploaded resume.",
+        request=ApplicationSerializer,
+        responses={
+            201: ApplicationSerializer,
+            400: OpenApiResponse(description="Validation error"),
+            403: OpenApiResponse(description="Permission denied"),
+        },
+    ),
+
+    update=extend_schema(
+        summary="Update Application",
+        description="Admin updates an application.",
+        request=ApplicationSerializer,
+        responses={200: ApplicationSerializer},
+    ),
+
+    partial_update=extend_schema(
+        summary="Partially Update Application",
+        description="Admin partially updates an application.",
+        request=ApplicationSerializer,
+        responses={200: ApplicationSerializer},
+    ),
+
+    destroy=extend_schema(
+        summary="Delete Application",
+        description="Delete an application.",
+        responses={
+            204: OpenApiResponse(description="Application deleted"),
+        },
+    ),
+)
+
+
 class ApplicationViewSet(BaseViewSet):
     queryset = Application.objects.select_related('job','job__employer', 'candidate','candidate__user')
     serializer_class = ApplicationSerializer
@@ -131,6 +187,18 @@ class ApplicationViewSet(BaseViewSet):
         # Auto automation
         auto_update_application_status(application)
 
+
+
+    @extend_schema(
+    summary="Update Application Status",
+    description="Employer updates an applicant's status following the allowed workflow (Applied → Shortlisted → Interview → Selected/Rejected).",
+    responses={
+        200: OpenApiResponse(description="Status updated"),
+        400: OpenApiResponse(description="Invalid transition"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    )
+
 # Update Status
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):
@@ -183,6 +251,17 @@ class ApplicationViewSet(BaseViewSet):
 
         return Response({"message": "Status updated","application_id":application.id,"status":application.status}) 
 
+
+
+    @extend_schema(
+    summary="Job Applicants",
+    description="Return all applicants for a specific job ordered by ATS score.",
+    responses={
+        200: ApplicationSerializer(many=True),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    )
+
 #Applicants for a Job
     @action(detail=False, methods=['get'], url_path='job/(?P<job_id>[^/.]+)/applicants')
     def job_applicants(self, request, job_id=None):
@@ -206,9 +285,18 @@ class ApplicationViewSet(BaseViewSet):
 
         serializer = self.get_serializer(applications, many=True)
         return Response(serializer.data)
-    
 
     
+    
+
+    @extend_schema(
+    summary="Application Status Summary",
+    description="Return status-wise application counts for a job. Cached for performance.",
+    responses={
+        200: OpenApiResponse(description="Status summary"),
+    },
+    )
+
 #Status wise counts per job
     @action(detail=False,methods=["get"],url_path=r"job/(?P<job_id>[^/.]+)/status-summary")
     def status_summary(self, request, job_id=None):
@@ -236,6 +324,16 @@ class ApplicationViewSet(BaseViewSet):
         return Response(summary)
 
 
+
+
+    @extend_schema(
+    summary="Application Timeline",
+    description="Return the complete status change history of an application.",
+    responses={
+        200: OpenApiResponse(description="Timeline"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    )
 
 # Timeline View
     @action(detail=True, methods=['get'])
@@ -286,6 +384,19 @@ class ApplicationViewSet(BaseViewSet):
 
         return Response(data)
 
+    
+
+
+
+    @extend_schema(
+    summary="Download Resume",
+    description="Generate a temporary AWS S3 pre-signed URL for downloading the applicant's resume.",
+    responses={
+        200: OpenApiResponse(description="Pre-signed download URL"),
+        403: OpenApiResponse(description="Permission denied"),
+        404: OpenApiResponse(description="Resume not found"),
+    },
+    )
 
     @action(detail=True, methods=["get"], url_path="download-resume")
     def download_resume(self, request, pk=None):

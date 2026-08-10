@@ -9,7 +9,22 @@ from core.serializers.payment_webhook_serializer import (
 from core.services.payment_gateway_service import (
     PaymentGatewayService
 )
+from drf_spectacular.utils import extend_schema,OpenApiResponse
 
+@extend_schema(
+    tags=["Payment Gateway"],
+    summary="Payment Webhook",
+    description="Webhook endpoint called by Razorpay for payment events.",
+    request=PaymentWebhookSerializer,
+    responses={
+        200: OpenApiResponse(
+            description="Webhook processed successfully."
+        ),
+        400: OpenApiResponse(
+            description="Invalid webhook signature."
+        ),
+    },
+)
 
 class PaymentWebhookAPIView(APIView):
 

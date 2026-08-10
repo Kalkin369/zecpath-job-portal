@@ -34,6 +34,20 @@ from core.serializers.payment_failure_serializer import (
     PaymentFailureSerializer
 )
 
+from drf_spectacular.utils import extend_schema,OpenApiResponse
+
+@extend_schema(
+    tags=["Finance Analytics"],
+    summary="Finance Dashboard",
+    description="Retrieve overall financial dashboard metrics.",
+    responses={
+        200: FinanceDashboardSerializer,
+        500: OpenApiResponse(
+            description="Unable to load finance dashboard"
+        ),
+    },
+)
+
 class FinanceDashboardAPIView(APIView):
 
     permission_classes = [IsAdmin]
@@ -79,6 +93,18 @@ class FinanceDashboardAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+@extend_schema(
+    tags=["Finance Analytics"],
+    summary="Daily Revenue",
+    description="Retrieve daily revenue metrics.",
+    responses={
+        200: DailyRevenueSerializer(many=True),
+        500: OpenApiResponse(
+            description="Unable to load daily revenue"
+        ),
+    },
+)
+
 
 class DailyRevenueAPIView(APIView):
 
@@ -112,6 +138,17 @@ class DailyRevenueAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+@extend_schema(
+    tags=["Finance Analytics"],
+    summary="Monthly Revenue",
+    description="Retrieve monthly revenue metrics.",
+    responses={
+        200: MonthlyRevenueSerializer(many=True),
+        500: OpenApiResponse(
+            description="Unable to load monthly revenue"
+        ),
+    },
+)
 
 class MonthlyRevenueAPIView(APIView):
 
@@ -145,6 +182,19 @@ class MonthlyRevenueAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+@extend_schema(
+    tags=["Finance Analytics"],
+    summary="Plan Revenue",
+    description="Revenue grouped by subscription plans.",
+    responses={
+        200: PlanRevenueSerializer(many=True),
+        500: OpenApiResponse(
+            description="Unable to load plan revenue"
+        ),
+    },
+)
+
+
 
 class PlanRevenueAPIView(APIView):
 
@@ -177,6 +227,18 @@ class PlanRevenueAPIView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+@extend_schema(
+    tags=["Finance Analytics"],
+    summary="Payment Failures",
+    description="Retrieve failed payment analytics.",
+    responses={
+        200: PaymentFailureSerializer(many=True),
+        500: OpenApiResponse(
+            description="Unable to load failed payments"
+        ),
+    },
+)
 
 
 class PaymentFailureAPIView(APIView):

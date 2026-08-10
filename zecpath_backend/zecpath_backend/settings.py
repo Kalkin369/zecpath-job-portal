@@ -15,6 +15,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from django.conf import settings
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'django_filters',
     'rest_framework_simplejwt.token_blacklist',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -139,6 +142,7 @@ AUTH_USER_MODEL = 'core.User'
 from datetime import timedelta
 
 SIMPLE_JWT = {
+    "SIGNING_KEY":settings.SECRET_KEY,
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS":True,
@@ -161,7 +165,9 @@ REST_FRAMEWORK = {
 
 
 
-    "DEFAULT_THROTTLE_RATES":{"interview":"20/min","login":"5/min","premium_recruiter":"20/hour"}
+    "DEFAULT_THROTTLE_RATES":{"interview":"20/min","login":"5/min","premium_recruiter":"20/hour"},
+
+    "DEFAULT_SCHEMA_CLASS":"drf_spectacular.openapi.AutoSchema",
 }                             
 
 
@@ -234,3 +240,28 @@ STORAGES = {
 }
 
 AWS_CLOUDFRONT_DOMAIN = os.getenv("AWS_CLOUDFRONT_DOMAIN")
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Zecpath Recruitment Platform API",
+
+    "DESCRIPTION": (
+        "REST APIs for the AI-powered "
+        "Zecpath Recruitment Platform."
+    ),
+
+    "VERSION": "1.0.0",
+
+    "SERVE_INCLUDE_SCHEMA": False,
+
+    "SWAGGER_UI_SETTINGS": {
+        "persistAuthorization": True,
+    },
+    "SECURITY":[
+        {
+            "BearerAuth":[]
+        }
+    ],
+
+    "COMPONENT_SPLIT_REQUEST":True,
+
+}

@@ -10,6 +10,21 @@ from core.services.scheduling_engine_service import (SchedulingEngineService)
 
 from core.services.logging_service import (LoggingService)
 
+from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer,OpenApiParameter
+from rest_framework import serializers
+
+@extend_schema(
+    tags=["Interview Scheduling"],
+    summary="Schedule Interview",
+    description="Automatically schedule an interview using the scheduling engine.",
+    request=inline_serializer(name="ScheduleInterviewRequest",fields={"application_id":serializers.IntegerField()}),
+    responses={
+        200: InterviewScheduleSerializer,
+        400: OpenApiResponse(description="No slot available."),
+        404: OpenApiResponse(description="Application not found."),
+    },
+)
+
 class ScheduleInterviewAPIView(APIView):
 
     permission_classes = [IsEmployer]
@@ -108,7 +123,19 @@ class ScheduleInterviewAPIView(APIView):
                 },
                 status=500
             )
-    
+
+@extend_schema(
+    tags=["Interview Scheduling"],
+    summary="Reschedule Interview",
+    description="Cancel the existing interview schedule and allow rescheduling.",
+    parameters=[OpenApiParameter(name="shedule_id",type=int,location=OpenApiParameter.PATH,required=True)],
+    request=None,
+    responses={
+        200: inline_serializer(name="ResheduleInterviewResponse",fields={"message":serializers.CharField()}),
+        404: OpenApiResponse(description="Schedule not found."),
+    },
+)
+
 class RescheduleInterviewAPIView(APIView):
 
     permission_classes = [IsEmployer]

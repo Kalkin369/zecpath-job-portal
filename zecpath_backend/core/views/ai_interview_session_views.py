@@ -5,6 +5,29 @@ from core.models.ai_interview_session import AIInterviewSession
 from core.serializers.ai_interview_session_serializer import (
     AIInterviewSessionSerializer
 )
+from drf_spectacular.utils import extend_schema,extend_schema_view
+
+@extend_schema(tags=["AI Sessions"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Interview Sessions"
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve Interview Session"
+    ),
+    create=extend_schema(
+        summary="Create Interview Session"
+    ),
+    update=extend_schema(
+        summary="Update Interview Session"
+    ),
+    partial_update=extend_schema(
+        summary="Partially Update Interview Session"
+    ),
+    destroy=extend_schema(
+        summary="Delete Interview Session"
+    ),
+)
 
 
 class AIInterviewSessionViewSet(BaseViewSet):

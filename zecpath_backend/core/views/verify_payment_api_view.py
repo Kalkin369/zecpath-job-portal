@@ -14,6 +14,26 @@ from core.services.payment_gateway_service import (
     PaymentGatewayService
 )
 
+from drf_spectacular.utils import extend_schema,OpenApiResponse
+
+
+@extend_schema(
+    tags=["Payment Gateway"],
+    summary="Verify Payment",
+    description="Verify Razorpay payment signature after checkout.",
+    request=VerifyPaymentSerializer,
+    responses={
+        200: OpenApiResponse(
+            description="Payment verified successfully."
+        ),
+        400: OpenApiResponse(
+            description="Payment verification failed."
+        ),
+        403: OpenApiResponse(
+            description="Employer authentication required."
+        ),
+    },
+)
 
 class VerifyPaymentAPIView(APIView):
 

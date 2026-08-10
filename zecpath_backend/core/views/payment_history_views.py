@@ -6,6 +6,19 @@ from core.permissions import IsEmployer
 
 from core.services.payment_gateway_service import PaymentGatewayService
 from core.serializers.payment_history_serializer import PaymentHistorySerializer
+from drf_spectacular.utils import extend_schema,OpenApiResponse
+
+@extend_schema(
+    tags=["Payment Gateway"],
+    summary="Get Payment History",
+    description="Retrieve payment history for the authenticated employer.",
+    responses={
+        200: PaymentHistorySerializer(many=True),
+        403: OpenApiResponse(
+            description="Employer authentication required."
+        ),
+    },
+)
 
 
 class PaymentHistoryAPIView(APIView):

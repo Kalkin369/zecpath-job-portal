@@ -12,5 +12,5 @@ class MonthlyRevenueSerializer(serializers.Serializer):
 
     transactions = serializers.IntegerField()
 
-    def get_month(self,obj):
+    def get_month(self,obj) -> str:
         return obj["month"].date()

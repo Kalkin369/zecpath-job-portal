@@ -6,6 +6,21 @@ from core.services.question_engine_service import (QuestionEngineService)
 
 from core.services.flow_manager_service import (FlowManagerService)
 
+from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer
+from rest_framework import serializers
+
+@extend_schema(
+    tags=["AI Interview"],
+    summary="Next Interview Question",
+    description="Return the next interview question for the current interview session.",
+    request=inline_serializer(name="NextQuestionRequest",fields={"role":serializers.CharField(),
+                                                                 "current_index":serializers.IntegerField(required=False),}),
+    responses={
+        200: OpenApiResponse(description="Question returned successfully."),
+        400: OpenApiResponse(description="Invalid request."),
+    },
+)
+
 
 class NextQuestionAPIView(APIView):
 
@@ -37,7 +52,18 @@ class NextQuestionAPIView(APIView):
             return Response({"message":"Interview Completed"})
 
         return Response(question)
-    
+
+@extend_schema(
+    tags=["AI Interview"],
+    summary="Submit Candidate Answer",
+    description="Submit a candidate's answer and retrieve the next follow-up question if applicable.",
+    request=inline_serializer(name="SubmitAnswerRequest",fields={"answer":serializers.CharField(),"role":serializers.CharField(),}),
+    responses={
+        200: OpenApiResponse(description="Answer processed successfully."),
+        400: OpenApiResponse(description="Answer or role is required."),
+    },
+)
+
 class SubmitAnswerAPIView(APIView):
 
     permission_classes = [IsCandidate]

@@ -10,6 +10,45 @@ from django.core.cache import cache
 
 from core.services.logging_service import LoggingService
 
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiResponse,
+    OpenApiExample,
+)
+
+@extend_schema(
+    tags=["Recruiter Analytics"],
+    summary="Recruiter Analytics Dashboard",
+    description=(
+        "Retrieve recruiter analytics including application statistics, "
+        "conversion funnel, hiring performance, and time-based metrics."
+    ),
+    responses={
+        200: OpenApiResponse(
+            description="Analytics retrieved successfully."
+        ),
+        403: OpenApiResponse(
+            description="Employer with analytics subscription required."
+        ),
+        500: OpenApiResponse(
+            description="Unable to load analytics."
+        ),
+    },
+    examples=[
+        OpenApiExample(
+            "Analytics Response",
+            value={
+                "total_applications": 125,
+                "funnel": {},
+                "conversion": {},
+                "job_performance": {},
+                "time_stats": {}
+            },
+            response_only=True,
+        )
+    ],
+)
+
 class RecruiterAnalyticsAPIView(APIView):
 
     permission_classes = [IsEmployerOrAdmin,CanUseAnalytics]

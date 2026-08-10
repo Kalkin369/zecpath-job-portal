@@ -3,7 +3,31 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import (extend_schema,OpenApiExample,OpenApiResponse,)
 
+@extend_schema(
+    tags=["Authentication"],
+    summary="Logout User",
+    description=(
+        "Blacklist the provided refresh token "
+        "to securely log the user out."
+    ),
+    request={
+        "application/json": {
+            "example": {
+                "refresh": "your_refresh_token"
+            }
+        }
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Logout successful."
+        ),
+        400: OpenApiResponse(
+            description="Invalid refresh token."
+        ),
+    },
+)
 
 class LogoutAPI(APIView):
 

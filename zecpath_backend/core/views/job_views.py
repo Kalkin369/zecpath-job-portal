@@ -12,6 +12,64 @@ from rest_framework import status
 
 from django.core.cache import cache
 
+from drf_spectacular.utils import (extend_schema,extend_schema_view, OpenApiResponse,)
+@extend_schema(
+   tags=["Jobs"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Jobs",
+        description="Retrieve all active jobs. Employers only see their own jobs.",
+        responses={
+            200: JobSerializer(many=True),
+        },
+    ),
+
+    retrieve=extend_schema(
+        summary="Retrieve Job",
+        description="Retrieve a single job by ID.",
+        responses={
+            200: JobSerializer,
+            404: OpenApiResponse(description="Job not found"),
+        },
+    ),
+
+    create=extend_schema(
+        summary="Create Job",
+        description="Employer creates a new job posting. Active subscription required.",
+        request=JobSerializer,
+        responses={
+            201: JobSerializer,
+            400: OpenApiResponse(description="Validation error"),
+            403: OpenApiResponse(description="Permission denied"),
+        },
+    ),
+
+    update=extend_schema(
+        summary="Update Job",
+        description="Update an existing job.",
+        request=JobSerializer,
+        responses={
+            200: JobSerializer,
+        },
+    ),
+
+    partial_update=extend_schema(
+        summary="Partially Update Job",
+        description="Update selected fields of a job.",
+        request=JobSerializer,
+        responses={
+            200: JobSerializer,
+        },
+    ),
+
+    destroy=extend_schema(
+        summary="Delete Job",
+        description="Delete an existing job.",
+        responses={
+            204: OpenApiResponse(description="Deleted successfully"),
+        },
+    ),
+)
 
 class JobViewSet(BaseViewSet):
     queryset = Job.objects.select_related('employer').order_by('-created_at')
@@ -91,7 +149,15 @@ class JobViewSet(BaseViewSet):
         raise PermissionDenied("Only employers can create jobs")
 
      serializer.save(employer=user.employer)
-   
+
+    @extend_schema(
+    summary="Toggle Job Status",
+    description="Activate or deactivate a job posting owned by the authenticated employer.",
+    responses={
+        200: OpenApiResponse(description="Job status updated"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    )   
 # Toggle status  
     @action(detail=True, methods=['post'])
     def toggle_status(self, request, pk=None):
@@ -106,7 +172,15 @@ class JobViewSet(BaseViewSet):
         job.save()
 
         return Response({"message": "Job status updated"})
-    
+
+
+    @extend_schema(
+    summary="Latest Jobs",
+    description="Return the latest 10 active job postings. Results are cached.",
+    responses={
+        200: JobSerializer(many=True),
+    },
+    ) 
 #Latest Jobs 
     @action(detail=False,methods=['get'])
     def latest(self,request):
@@ -122,7 +196,16 @@ class JobViewSet(BaseViewSet):
        cache.set('latest_jobs',serializer.data,timeout=60)
        
        return Response(serializer.data)
+
     
+
+    @extend_schema(
+    summary="Featured Jobs",
+    description="Return featured jobs suitable for freshers (experience ≤ 2 years). Cached for performance.",
+    responses={
+        200: JobSerializer(many=True),
+    },
+    )
 #Featured Jobs
     @action(detail=False, methods=['get'])
     def featured(self,request):
@@ -139,7 +222,17 @@ class JobViewSet(BaseViewSet):
        cache.set('featured_jobs',serializer.data,timeout=60)
 
        return Response(serializer.data)
-      
+
+
+
+    @extend_schema(
+    summary="Recommended Jobs",
+    description="Return jobs matching the authenticated candidate's skills.",
+    responses={
+        200: JobSerializer(many=True),
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    )    
 #Profile based Recommendations
     @action(detail=False, methods=['get'])
     def recommended(self, request):

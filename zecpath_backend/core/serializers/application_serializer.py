@@ -44,13 +44,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['candidate','status', 'applied_at','ats_score']
 
-    def get_status_message(self,obj):
+    def get_status_message(self,obj) -> str:
         return f"Your application is currently {obj.status}"    
     
-    def get_match_percentage(self,obj):
+    def get_match_percentage(self,obj) -> str:
         return f"{obj.ats_score}%"
     
-    def get_automation_status(self,obj):
+    def get_automation_status(self,obj) -> str:
         
         if obj.status == 'shortlisted':
             return 'Auto Shortlisted'

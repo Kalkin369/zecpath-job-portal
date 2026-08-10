@@ -14,8 +14,50 @@ from core.serializers.user_serializer import UserSerializer
 from core.serializers.job_serializer import JobSerializer
 from django.core.cache import cache
 
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiResponse,
+)
 
-
+@extend_schema(
+    tags=["Admin Management"]
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Employers",
+        description="Retrieve all employers.",
+        responses={200: EmployerSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        summary="Employer Detail",
+        description="Retrieve employer details.",
+        responses={200: EmployerSerializer},
+    ),
+    create=extend_schema(
+        summary="Create Employer",
+        request=EmployerSerializer,
+        responses={201: EmployerSerializer},
+    ),
+    update=extend_schema(
+        summary="Update Employer",
+        request=EmployerSerializer,
+        responses={200: EmployerSerializer},
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update Employer",
+        request=EmployerSerializer,
+        responses={200: EmployerSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete Employer",
+        responses={
+            204: OpenApiResponse(
+                description="Employer deleted"
+            )
+        },
+    ),
+)
 
 # Admin Employer APIs
 class AdminEmployerViewSet(BaseViewSet):
@@ -23,6 +65,17 @@ class AdminEmployerViewSet(BaseViewSet):
     queryset = Employer.objects.all()
     serializer_class = EmployerSerializer
     permission_classes = [IsAdmin]
+
+
+    @extend_schema(
+    summary="Approve Employer",
+    description="Approve an employer account.",
+    responses={
+        200: OpenApiResponse(
+            description="Employer approved"
+        )
+    }
+    )
 
 # Approve Employer Action
     @action(detail=True, methods=['post'])
@@ -36,6 +89,45 @@ class AdminEmployerViewSet(BaseViewSet):
         return Response({
             "message": "Employer approved"
         })
+
+
+@extend_schema(
+    tags=["Admin Management"]
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Users",
+        responses={200: UserSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        summary="User Detail",
+        responses={200: UserSerializer},
+    ),
+    create=extend_schema(
+        summary="Create User",
+        request=UserSerializer,
+        responses={201: UserSerializer},
+    ),
+    update=extend_schema(
+        summary="Update User",
+        request=UserSerializer,
+        responses={200: UserSerializer},
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update User",
+        request=UserSerializer,
+        responses={200: UserSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete User",
+        responses={
+            204: OpenApiResponse(
+                description="User deleted"
+            )
+        },
+    ),
+)
+   
     
 # Admin User APIs
 class AdminUserViewSet(BaseViewSet):
@@ -43,6 +135,17 @@ class AdminUserViewSet(BaseViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
+
+    @extend_schema(
+    summary="Block User",
+    description="Block a user account.",
+    responses={
+        200: OpenApiResponse(
+            description="User blocked"
+        )
+    }
+    )
+
 
 #Block Action
     @action(detail=True, methods=['post'])
@@ -57,7 +160,44 @@ class AdminUserViewSet(BaseViewSet):
             "message": "User blocked"
         }) 
     
-    
+@extend_schema(
+    tags=["Admin Management"]
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Jobs",
+        responses={200: JobSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        summary="Job Detail",
+        responses={200: JobSerializer},
+    ),
+    create=extend_schema(
+        summary="Create Job",
+        request=JobSerializer,
+        responses={201: JobSerializer},
+    ),
+    update=extend_schema(
+        summary="Update Job",
+        request=JobSerializer,
+        responses={200: JobSerializer},
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update Job",
+        request=JobSerializer,
+        responses={200: JobSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete Job",
+        responses={
+            204: OpenApiResponse(
+                description="Job deleted"
+            )
+        },
+    ),
+)
+
+
 # Admin Job APIs
 class AdminJobViewSet(BaseViewSet):
 
@@ -65,7 +205,17 @@ class AdminJobViewSet(BaseViewSet):
     serializer_class = JobSerializer
     permission_classes = [IsAdmin]    
 
+    @extend_schema(
+    summary="Remove Spam Job",
+    description="Deactivate a spam or fraudulent job posting.",
+    responses={
+        200: OpenApiResponse(
+            description="Spam job removed"
+        )
+    }
+    )
 
+    
 #Spam Removal Action
     @action(detail=True, methods=['post'])
     def remove_spam(self, request, pk=None):
@@ -79,6 +229,15 @@ class AdminJobViewSet(BaseViewSet):
             "message": "Spam job removed"
         }) 
     
+    @extend_schema(
+    summary="Platform Statistics",
+    description="Retrieve platform-wide dashboard statistics.",
+    responses={
+        200: OpenApiResponse(
+            description="Platform statistics"
+        )
+    }
+    )
 
 
 # Dashboard Stats Action

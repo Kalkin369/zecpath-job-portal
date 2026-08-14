@@ -20,20 +20,23 @@ def calculate_skill_score(
 
     return round(score, 2), matched_skills
 
+
+def safe_int(value):
+
+    try:
+        return int(value)
+
+    except (TypeError, ValueError):
+        return 0
+
+
 def calculate_experience_score(
     candidate_exp,
     required_exp
 ):
 
-    try:
-        candidate_exp = int(candidate_exp)
-    except:
-        candidate_exp = 0
-
-    try:
-        required_exp = int(required_exp)
-    except:
-        required_exp = 0
+    candidate_exp = safe_int(candidate_exp)
+    required_exp = safe_int(required_exp)
 
     if required_exp == 0:
         return 100
@@ -46,6 +49,7 @@ def calculate_experience_score(
     ) * 100
 
     return round(score, 2)
+
 
 def calculate_education_score(
     candidate_education,

@@ -9,6 +9,7 @@ from core.services.auth_service import generate_tokens
 from core.utils.response import success_response
 from rest_framework_simplejwt.tokens import RefreshToken
 from core.services.logging_service import LoggingService
+from core.utils.error_handler import handle_exception
 
 
 from core.throttles import LoginThrottle
@@ -172,20 +173,15 @@ class RefreshAPI(APIView):
             token = RefreshToken(refresh_token)
             access_token = str(token.access_token)
 
-            return Response({
-                "status": "success",
-                "status_code": 200,
-                "message": "Token refreshed",
-                "data": {
-                    "access": access_token
-                }
-            })
+            return success_response(
+                {
+                    "access":access_token
+                },
+                "Token refreshed"
+            )
 
         except Exception as e:
 
-            LoggingService().create_error_log("RefreshAPI",str(e))
-
-            return Response({
-                "status": "fail",
-                "message": "Invalid or expired refresh token"
-            }, status=status.HTTP_400_BAD_REQUEST)    
+            return handle_exception(
+                "RefreshAPI",e,"Invalid or expired refresh token",status.HTTP_400_BAD_REQUEST
+            )

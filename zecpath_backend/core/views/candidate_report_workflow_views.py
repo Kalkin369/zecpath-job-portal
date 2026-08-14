@@ -11,6 +11,7 @@ from core.services.logging_service import (LoggingService)
 
 from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer
 from rest_framework import serializers
+from core.utils.error_handler import handle_exception
 
 @extend_schema(
     tags=["Candidate Reports"],
@@ -99,15 +100,7 @@ class GenerateReportAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "GenerateReportAPIView",
-                str(e)
+            return handle_exception(
+                "GenerateReportAPIView",e,"Failed to generate report"
             )
-
-            return Response(
-                {
-                    "error":
-                    "Failed to generate report"
-                },
-                status=500
-            )
+            

@@ -8,7 +8,9 @@ from core.services.recruiter_analytics_service import (RecruiterAnalyticsService
 
 from django.core.cache import cache
 
-from core.services.logging_service import LoggingService
+
+from core.utils.error_handler import handle_exception
+
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -108,6 +110,6 @@ class RecruiterAnalyticsAPIView(APIView):
         )
       except Exception as e:
 
-        LoggingService().create_error_log("RecruiterAnalyticsAPIView",str(e))
-
-        return Response({"success":False,"message":"Unable to load analytics"},status=500)
+        return handle_exception(
+           "RecruiterAnalyticsAPIView",e,"Unable to load analytics"
+        )

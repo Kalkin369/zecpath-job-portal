@@ -1,6 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from core.views import *
+from core.views.user_views import UserViewSet
+from core.views.employer_views import EmployerViewSet
+from core.views.candidate_views import CandidateViewSet
+from core.views.job_views import JobViewSet
+from core.views.application_views import ApplicationViewSet
 from core.views.auth_views import SignupAPI,LoginAPI,RefreshAPI
 from core.views.saved_job_views import SavedJobViewSet
 from core.views.admin_views import AdminEmployerViewSet,AdminUserViewSet,AdminJobViewSet

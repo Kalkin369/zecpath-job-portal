@@ -14,6 +14,8 @@ from core.services.logging_service import (
     LoggingService
 )
 
+from core.utils.error_handler import handle_exception
+
 from core.serializers.finance_dashboard_serializer import (
     FinanceDashboardSerializer
 )
@@ -80,19 +82,9 @@ class FinanceDashboardAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "FinanceDashboardAPIView",
-                str(e)
+            return handle_exception(
+                "FinanceDashboardAPIView",e,"Unable to load finance dashboard."
             )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to load finance dashboard."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
 @extend_schema(
     tags=["Finance Analytics"],
     summary="Daily Revenue",
@@ -125,17 +117,8 @@ class DailyRevenueAPIView(APIView):
         
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "DailyRevenueAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to load daily revenue."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            return handle_exception(
+                "DailyRevenueAPIView",e,"Unable to load daily revenue."
             )
 
 @extend_schema(
@@ -169,17 +152,8 @@ class MonthlyRevenueAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "MonthlyRevenueAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to load monthly revenue."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            return handle_exception(
+                "MonthlyRevenueAPIView",e,"Unable to load monthly revenue."
             )
 
 @extend_schema(
@@ -215,17 +189,8 @@ class PlanRevenueAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "PlanRevenueAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to load plan revenue."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            return handle_exception(
+                "PlanRevenueAPIView",e,"Unable to load plan revenue."
             )
 
 @extend_schema(
@@ -257,15 +222,6 @@ class PaymentFailureAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "PaymentFailureAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to load failed payments."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            return handle_exception(
+                "PaymentFailureAPIView",e,"Unable to load failed payments."
             )

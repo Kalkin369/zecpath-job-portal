@@ -11,7 +11,10 @@ class CandidateReportService:
         application
     ):
 
-        evaluations = (AnswerEvaluation.objects.filter(answer__question__session__ai_call__application=application) )
+        evaluations = (AnswerEvaluation.objects.filter(
+            answer__question__session__ai_call__application=application
+            )
+        )
 
         total_score = sum(
             evaluation.total_score
@@ -27,7 +30,7 @@ class CandidateReportService:
 
     def generate_report(
         self,
-        application
+        application,
     ):
 
         ats_score = (
@@ -45,7 +48,6 @@ class CandidateReportService:
         risks = []
 
         # Strengths
-
         if ats_score >= 70:
 
             strengths.append(
@@ -59,7 +61,6 @@ class CandidateReportService:
             )
 
         # Risks
-
         if ats_score < 50:
 
             risks.append(
@@ -73,7 +74,6 @@ class CandidateReportService:
             )
 
         # Summary
-
         summary = (
             f"Candidate achieved "
             f"{ai_score:.2f}% AI score "
@@ -82,7 +82,6 @@ class CandidateReportService:
         )
 
         # Prevent duplicate reports
-
         report, created = (
             CandidateReport.objects.update_or_create(
                 application=application,

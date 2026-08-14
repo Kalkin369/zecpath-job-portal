@@ -9,7 +9,7 @@ from core.serializers.interview_schedule_serializer import (InterviewScheduleSer
 from core.services.scheduling_engine_service import (SchedulingEngineService)
 
 from core.services.logging_service import (LoggingService)
-
+from core.utils.error_handler import handle_exception
 from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer,OpenApiParameter
 from rest_framework import serializers
 
@@ -111,27 +111,19 @@ class ScheduleInterviewAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "ScheduleInterviewAPIView",
-                str(e)
+            return handle_exception(
+                "SceduleInterview",e,"Failed to shedule interview"
             )
-
-            return Response(
-                {
-                    "error":
-                    "Failed to schedule interview"
-                },
-                status=500
-            )
+            
 
 @extend_schema(
     tags=["Interview Scheduling"],
     summary="Reschedule Interview",
     description="Cancel the existing interview schedule and allow rescheduling.",
-    parameters=[OpenApiParameter(name="shedule_id",type=int,location=OpenApiParameter.PATH,required=True)],
+    parameters=[OpenApiParameter(name="schedule_id",type=int,location=OpenApiParameter.PATH,required=True)],
     request=None,
     responses={
-        200: inline_serializer(name="ResheduleInterviewResponse",fields={"message":serializers.CharField()}),
+        200: inline_serializer(name="RescheduleInterviewResponse",fields={"message":serializers.CharField()}),
         404: OpenApiResponse(description="Schedule not found."),
     },
 )

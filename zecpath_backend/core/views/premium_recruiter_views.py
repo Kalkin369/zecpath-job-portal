@@ -5,8 +5,8 @@ from core.permissions import (IsEmployer,CanUseAnalytics)
 
 from core.services.premium_recruiter_service import (PremiumRecruiterService)
 
-from core.services.logging_service import (LoggingService)
 
+from core.utils.error_handler import handle_exception
 from core.throttles import PremiumRecruiterThrottle
 
 from django.core.cache import cache
@@ -66,18 +66,12 @@ class CandidateRankingAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
+            return handle_exception(
                 "CandidateRankingAPIView",
-                str(e)
+                e,
+                "Unable to generate candidate ranking."
             )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to generate candidate ranking."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            
 
 @extend_schema(
     tags=["Premium Analytics"],
@@ -124,17 +118,10 @@ class HiringEfficiencyAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
+            return handle_exception(
                 "HiringEfficiencyAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to generate hiring efficiency report."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                e,
+                "Unable to generate hiring efficiency report."
             )
 
 @extend_schema(
@@ -183,17 +170,10 @@ class CandidatePredictionAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
+            return handle_exception(
                 "CandidatePredictionAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to generate prediction report."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                e,
+                "Unable to generate prediction report."
             )
 
 @extend_schema(
@@ -260,15 +240,8 @@ class PremiumDashboardAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
+            return handle_exception(
                 "PremiumDashboardAPIView",
-                str(e)
-            )
-
-            return Response(
-                {
-                    "success": False,
-                    "message": "Unable to load premium dashboard."
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                e,
+                "Unable to load premium dashboard."
             )

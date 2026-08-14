@@ -5,6 +5,7 @@ from core.permissions import IsCandidate
 from core.services.resume_parser_service import (extract_resume_text)
 from core.services.resume_nlp_service import (build_resume_json)
 from core.services.logging_service import LoggingService
+from core.utils.error_handler import handle_exception
 from drf_spectacular.utils import extend_schema,OpenApiExample,OpenApiResponse
 
 @extend_schema(
@@ -89,9 +90,9 @@ class ResumeParserAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log("ResumeParserAPIView",str(e))  
-
-            return Response({"error":"Unable to parse resume"},status=400)
+            return handle_exception(
+                "ResumeParserAPIView",e,"Unable to parse resume."
+            )
 
         return Response({
             "parsed_text": text,

@@ -1,5 +1,3 @@
-from core.models.ai_call import AICall
-
 class VoiceCallService:
 
     def trigger_call(

@@ -13,6 +13,7 @@ from core.services.answer_evaluation_service import (AnswerEvaluationService)
 
 from core.serializers.answer_evaluation_serializer import (AnswerEvaluationSerializer)
 from core.services.logging_service import (LoggingService)
+from core.utils.error_handler import handle_exception
 from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer
 from rest_framework import serializers
 
@@ -97,34 +98,15 @@ class EvaluateAnswerAPIView(APIView):
 
         except Http404:
 
-            LoggingService().create_error_log(
-                "EvaluateAnswerAPIView",
-                f"Answer {answer_id} not found"
-            )
-
-            return Response(
-                {
-                    "error":
-                    "Answer not found"
-                },
-                status=status.HTTP_404_NOT_FOUND
+            return handle_exception(
+                "EvaluateAnswerAPIView",e,"Answer not found",status.HTTP_404_NOT_FOUND
             )
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "EvaluateAnswerAPIView",
-                str(e)
+            return handle_exception(
+                "EvaluateAnswerAPIView",e,"Evaluation failed"
             )
-
-            return Response(
-                {
-                    "error":
-                    "Evaluation failed"
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
 @extend_schema(
     tags=["AI Evaluation"],
     summary="Evaluation Detail",

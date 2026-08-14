@@ -8,6 +8,7 @@ from core.services.tts_service import (TTSService)
 from core.services.stt_service import (STTService)
 from core.services.voice_call_service import (VoiceCallService)
 from core.services.logging_service import (LoggingService)
+from core.utils.error_handler import handle_exception
 from drf_spectacular.utils import extend_schema,OpenApiResponse,inline_serializer
 from rest_framework import serializers
 
@@ -140,9 +141,7 @@ class TriggerCallAPIView(APIView):
 
         except Exception as e:
 
-            LoggingService().create_error_log(
-                "TriggerCallAPIView",
-                f"Phone {phone}: {str(e)}"
+            return handle_exception(
+                "TriggerCallAPIView",e, 
+                "trigger call failed."
             )
-
-            return Response({"error":"Call trigger failed"},status=500)

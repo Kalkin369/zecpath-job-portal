@@ -1,17 +1,14 @@
 from rest_framework import serializers
+
 from core.models import PaymentTransaction
 
 
 class PaymentDetailSerializer(serializers.ModelSerializer):
 
-    plan = serializers.CharField(
-        source="subscription.plan.name",
-        read_only=True
-    )
+    plan = serializers.CharField(source="subscription.plan.name", read_only=True)
 
     employer = serializers.CharField(
-        source="subscription.employer.company_name",
-        read_only=True
+        source="subscription.employer.company_name", read_only=True
     )
 
     class Meta:

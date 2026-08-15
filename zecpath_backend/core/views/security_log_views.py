@@ -1,12 +1,20 @@
-from rest_framework.views import APIView
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view
+)
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from core.services.logging_service import (LoggingService)
+from core.models import SecurityLog
 from core.permissions import IsAdmin
+from core.serializers.security_log_serializer import SecurityLogSerializer
+from core.services.logging_service import LoggingService
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
-from core.models import (SecurityLog)
-from core.serializers.security_log_serializer import (SecurityLogSerializer)
-from drf_spectacular.utils import extend_schema,OpenApiResponse,OpenApiExample
+
 
 @extend_schema(
     tags=["Security"],
@@ -15,57 +23,30 @@ from drf_spectacular.utils import extend_schema,OpenApiResponse,OpenApiExample
         "Generate a sample security event for testing the security logging system."
     ),
     responses={
-        200: OpenApiResponse(
-            description="Security log created successfully."
-        ),
+        200: OpenApiResponse(description="Security log created successfully."),
     },
     examples=[
         OpenApiExample(
             "Success",
-            value={
-                "message": "Security Log Created"
-            },
+            value={"message": "Security Log Created"},
             response_only=True,
         )
     ],
 )
-
-
-
-
 class SecurityTestAPIView(APIView):
 
-    def get(self,request):
+    def get(self, request):
 
         LoggingService().create_security_log(
-            request.META.get(
-                'REMOTE_ADDR',
-                'Unknown'
-            ),
+            request.META.get("REMOTE_ADDR", "Unknown"),
             "Unauthorized Access Attempt"
         )
 
-        return Response(
-            {
-                "message":
-                "Security Log Created"
-            }
-        )
-from rest_framework import mixins
-from rest_framework.viewsets import GenericViewSet
+        return Response({"message": "Security Log Created"})
 
-from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
-    OpenApiResponse,
-)
 
-@extend_schema(
-    tags=["Security Logs"]
-)
-
+@extend_schema(tags=["Security Logs"])
 @extend_schema_view(
-
     list=extend_schema(
         summary="List Security Logs",
         description="Retrieve all recorded security events.",
@@ -73,31 +54,23 @@ from drf_spectacular.utils import (
             200: SecurityLogSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve Security Log",
         description="Retrieve a security log by ID.",
         responses={
             200: SecurityLogSerializer,
-            404: OpenApiResponse(
-                description="Security log not found."
-            ),
+            404: OpenApiResponse(description="Security log not found."),
         },
     ),
-
-    
 )
-    
 class SecurityLogViewSet(
-
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     GenericViewSet,
-
 ):
 
-    queryset = (SecurityLog.objects.all().order_by('-created_at'))
+    queryset = SecurityLog.objects.all().order_by("-created_at")
 
-    serializer_class = (SecurityLogSerializer)
+    serializer_class = SecurityLogSerializer
 
-    permission_classes = [IsAdmin]    
+    permission_classes = [IsAdmin]

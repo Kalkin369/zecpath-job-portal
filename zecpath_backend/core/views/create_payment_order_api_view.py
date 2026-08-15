@@ -1,18 +1,16 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema
+)
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from core.permissions import IsEmployer
-
-from core.serializers.create_payment_order_serializer import (
+from core.serializers.create_payment_order_serializer import \
     CreatePaymentOrderSerializer
-)
+from core.services.payment_gateway_service import PaymentGatewayService
 
-from core.services.payment_gateway_service import (
-    PaymentGatewayService
-)
-
-from drf_spectacular.utils import extend_schema,OpenApiResponse
 
 @extend_schema(
     tags=["Payment Gateway"],
@@ -20,43 +18,24 @@ from drf_spectacular.utils import extend_schema,OpenApiResponse
     description="Create a Razorpay order for a subscription purchase.",
     request=CreatePaymentOrderSerializer,
     responses={
-        201: OpenApiResponse(
-            description="Payment order created successfully."
-        ),
-        400: OpenApiResponse(
-            description="Invalid subscription."
-        ),
-        403: OpenApiResponse(
-            description="Employer authentication required."
-        ),
+        201: OpenApiResponse(description="Payment order created successfully."),
+        400: OpenApiResponse(description="Invalid subscription."),
+        403: OpenApiResponse(description="Employer authentication required."),
     },
 )
-
-
 class CreatePaymentOrderAPIView(APIView):
 
-    permission_classes = [
-        IsEmployer
-    ]
+    permission_classes = [IsEmployer]
 
-    def post(
-        self,
-        request
-    ):
+    def post(self, request):
 
-        serializer = CreatePaymentOrderSerializer(
-            data=request.data
-        )
+        serializer = CreatePaymentOrderSerializer(data=request.data)
 
-        serializer.is_valid(
-            raise_exception=True
-        )
+        serializer.is_valid(raise_exception=True)
 
         result = PaymentGatewayService().create_payment_order(
             employer=request.user.employer,
-            subscription_id=serializer.validated_data[
-                "subscription_id"
-            ]
+            subscription_id=serializer.validated_data["subscription_id"],
         )
 
         order = result["order"]
@@ -67,7 +46,7 @@ class CreatePaymentOrderAPIView(APIView):
                 "order_id": order["id"],
                 "amount": order["amount"],
                 "currency": order["currency"],
-                "status": order["status"]
+                "status": order["status"],
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )

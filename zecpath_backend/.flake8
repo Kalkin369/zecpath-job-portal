@@ -1,0 +1,4 @@
+[flake8] 
+exclude = migrations,env,venv,__pycache__
+
+max-linr-length = 88

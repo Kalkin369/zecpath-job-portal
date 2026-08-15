@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0014_questiontemplate_interviewstate_aiquestion_template'),
+        ("core", "0014_questiontemplate_interviewstate_aiquestion_template"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='questiontemplate',
-            name='expected_keywords',
+            model_name="questiontemplate",
+            name="expected_keywords",
             field=models.JSONField(blank=True, default=list),
         ),
         migrations.AddField(
-            model_name='questiontemplate',
-            name='weight',
+            model_name="questiontemplate",
+            name="weight",
             field=models.FloatField(default=1),
         ),
     ]

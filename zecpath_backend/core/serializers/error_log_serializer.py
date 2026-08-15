@@ -1,16 +1,12 @@
 from rest_framework import serializers
 
-from core.models import (
-    ErrorLog
-)
+from core.models import ErrorLog
 
 
-class ErrorLogSerializer(
-    serializers.ModelSerializer
-):
+class ErrorLogSerializer(serializers.ModelSerializer):
 
     class Meta:
 
         model = ErrorLog
 
-        fields = '__all__'
+        fields = "__all__"

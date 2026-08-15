@@ -7,49 +7,104 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0012_aicall'),
+        ("core", "0012_aicall"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AIInterviewSession',
+            name="AIInterviewSession",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('started_at', models.DateTimeField(auto_now_add=True)),
-                ('ended_at', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(default='in_progress', max_length=20)),
-                ('transcript', models.JSONField(blank=True, null=True)),
-                ('ai_call', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='core.aicall')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("started_at", models.DateTimeField(auto_now_add=True)),
+                ("ended_at", models.DateTimeField(blank=True, null=True)),
+                ("status", models.CharField(default="in_progress", max_length=20)),
+                ("transcript", models.JSONField(blank=True, null=True)),
+                (
+                    "ai_call",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.aicall"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='AIQuestion',
+            name="AIQuestion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('question_text', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('session', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='core.aiinterviewsession')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("question_text", models.TextField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "session",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="questions",
+                        to="core.aiinterviewsession",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='AIAnswer',
+            name="AIAnswer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('answer_text', models.TextField()),
-                ('score', models.FloatField(default=0)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('question', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='core.aiquestion')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("answer_text", models.TextField()),
+                ("score", models.FloatField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "question",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.aiquestion",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='CallLog',
+            name="CallLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('event', models.CharField(max_length=255)),
-                ('triggered_by', models.CharField(max_length=100)),
-                ('reason', models.CharField(max_length=225)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('ai_call', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.aicall')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("event", models.CharField(max_length=255)),
+                ("triggered_by", models.CharField(max_length=100)),
+                ("reason", models.CharField(max_length=225)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "ai_call",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.aicall"
+                    ),
+                ),
             ],
         ),
     ]

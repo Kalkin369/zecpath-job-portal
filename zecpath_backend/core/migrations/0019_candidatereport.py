@@ -7,21 +7,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0018_interviewreminder'),
+        ("core", "0018_interviewreminder"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CandidateReport',
+            name="CandidateReport",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ats_score', models.FloatField(default=0)),
-                ('ai_score', models.FloatField(default=0)),
-                ('strengths', models.JSONField(default=list)),
-                ('risks', models.JSONField(default=list)),
-                ('summary', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('application', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='core.application')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("ats_score", models.FloatField(default=0)),
+                ("ai_score", models.FloatField(default=0)),
+                ("strengths", models.JSONField(default=list)),
+                ("risks", models.JSONField(default=list)),
+                ("summary", models.TextField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "application",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.application",
+                    ),
+                ),
             ],
         ),
     ]

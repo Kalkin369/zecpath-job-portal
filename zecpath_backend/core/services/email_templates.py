@@ -1,6 +1,4 @@
-def application_status_template(
-    application
-):
+def application_status_template(application):
 
     return (
         f"Hello "
@@ -11,6 +9,7 @@ def application_status_template(
         f"{application.status}.\n\n"
         f"Thank you."
     )
+
 
 def payment_success_template(payment):
 

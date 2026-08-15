@@ -1,28 +1,24 @@
-from core.views.base_viewset import BaseViewSet
+from django.core.cache import cache
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view
+)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from core.permissions import IsAdmin
-
-from core.models.employer import Employer
-from core.models.user import User
-from core.models.job import Job
 from core.models.application import Application
-
+from core.models.employer import Employer
+from core.models.job import Job
+from core.models.user import User
+from core.permissions import IsAdmin
 from core.serializers.employer_serializer import EmployerSerializer
-from core.serializers.user_serializer import UserSerializer
 from core.serializers.job_serializer import JobSerializer
-from django.core.cache import cache
+from core.serializers.user_serializer import UserSerializer
+from core.views.base_viewset import BaseViewSet
 
-from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
-    OpenApiResponse,
-)
 
-@extend_schema(
-    tags=["Admin Management"]
-)
+@extend_schema(tags=["Admin Management"])
 @extend_schema_view(
     list=extend_schema(
         summary="List Employers",
@@ -51,14 +47,9 @@ from drf_spectacular.utils import (
     ),
     destroy=extend_schema(
         summary="Delete Employer",
-        responses={
-            204: OpenApiResponse(
-                description="Employer deleted"
-            )
-        },
+        responses={204: OpenApiResponse(description="Employer deleted")},
     ),
 )
-
 # Admin Employer APIs
 class AdminEmployerViewSet(BaseViewSet):
 
@@ -66,19 +57,14 @@ class AdminEmployerViewSet(BaseViewSet):
     serializer_class = EmployerSerializer
     permission_classes = [IsAdmin]
 
-
     @extend_schema(
-    summary="Approve Employer",
-    description="Approve an employer account.",
-    responses={
-        200: OpenApiResponse(
-            description="Employer approved"
-        )
-    }
+        summary="Approve Employer",
+        description="Approve an employer account.",
+        responses={200: OpenApiResponse(description="Employer approved")},
     )
 
-# Approve Employer Action
-    @action(detail=True, methods=['post'])
+    # Approve Employer Action
+    @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
 
         employer = self.get_object()
@@ -86,14 +72,10 @@ class AdminEmployerViewSet(BaseViewSet):
         employer.is_verified = True
         employer.save(update_fields=["is_verified"])
 
-        return Response({
-            "message": "Employer approved"
-        })
+        return Response({"message": "Employer approved"})
 
 
-@extend_schema(
-    tags=["Admin Management"]
-)
+@extend_schema(tags=["Admin Management"])
 @extend_schema_view(
     list=extend_schema(
         summary="List Users",
@@ -120,15 +102,9 @@ class AdminEmployerViewSet(BaseViewSet):
     ),
     destroy=extend_schema(
         summary="Delete User",
-        responses={
-            204: OpenApiResponse(
-                description="User deleted"
-            )
-        },
+        responses={204: OpenApiResponse(description="User deleted")},
     ),
 )
-   
-    
 # Admin User APIs
 class AdminUserViewSet(BaseViewSet):
 
@@ -137,18 +113,13 @@ class AdminUserViewSet(BaseViewSet):
     permission_classes = [IsAdmin]
 
     @extend_schema(
-    summary="Block User",
-    description="Block a user account.",
-    responses={
-        200: OpenApiResponse(
-            description="User blocked"
-        )
-    }
+        summary="Block User",
+        description="Block a user account.",
+        responses={200: OpenApiResponse(description="User blocked")},
     )
 
-
-#Block Action
-    @action(detail=True, methods=['post'])
+    # Block Action
+    @action(detail=True, methods=["post"])
     def block(self, request, pk=None):
 
         user = self.get_object()
@@ -156,13 +127,10 @@ class AdminUserViewSet(BaseViewSet):
         user.is_blocked = True
         user.save(update_fields=["is_blocked"])
 
-        return Response({
-            "message": "User blocked"
-        }) 
-    
-@extend_schema(
-    tags=["Admin Management"]
-)
+        return Response({"message": "User blocked"})
+
+
+@extend_schema(tags=["Admin Management"])
 @extend_schema_view(
     list=extend_schema(
         summary="List Jobs",
@@ -189,62 +157,42 @@ class AdminUserViewSet(BaseViewSet):
     ),
     destroy=extend_schema(
         summary="Delete Job",
-        responses={
-            204: OpenApiResponse(
-                description="Job deleted"
-            )
-        },
+        responses={204: OpenApiResponse(description="Job deleted")},
     ),
 )
-
-
 # Admin Job APIs
 class AdminJobViewSet(BaseViewSet):
 
     queryset = Job.objects.all()
     serializer_class = JobSerializer
-    permission_classes = [IsAdmin]    
+    permission_classes = [IsAdmin]
 
     @extend_schema(
-    summary="Remove Spam Job",
-    description="Deactivate a spam or fraudulent job posting.",
-    responses={
-        200: OpenApiResponse(
-            description="Spam job removed"
-        )
-    }
+        summary="Remove Spam Job",
+        description="Deactivate a spam or fraudulent job posting.",
+        responses={200: OpenApiResponse(description="Spam job removed")},
     )
-
-    
-#Spam Removal Action
-    @action(detail=True, methods=['post'])
+    # Spam Removal Action
+    @action(detail=True, methods=["post"])
     def remove_spam(self, request, pk=None):
 
         job = self.get_object()
 
-        job.status = 'inactive'
+        job.status = "inactive"
         job.save(update_fields=["status"])
 
-        return Response({
-            "message": "Spam job removed"
-        }) 
-    
+        return Response({"message": "Spam job removed"})
+
     @extend_schema(
-    summary="Platform Statistics",
-    description="Retrieve platform-wide dashboard statistics.",
-    responses={
-        200: OpenApiResponse(
-            description="Platform statistics"
-        )
-    }
+        summary="Platform Statistics",
+        description="Retrieve platform-wide dashboard statistics.",
+        responses={200: OpenApiResponse(description="Platform statistics")},
     )
-
-
-# Dashboard Stats Action
-    @action(detail=False, methods=['get'])
+    # Dashboard Stats Action
+    @action(detail=False, methods=["get"])
     def stats(self, request):
 
-        cached_stats = cache.get('platform_stats')
+        cached_stats = cache.get("platform_stats")
 
         if cached_stats:
             return Response(cached_stats)
@@ -256,7 +204,6 @@ class AdminJobViewSet(BaseViewSet):
             "total_employers": Employer.objects.count(),
         }
 
-        cache.set('platform_stats',data,timeout=120)
+        cache.set("platform_stats", data, timeout=120)
 
         return Response(data)
-       

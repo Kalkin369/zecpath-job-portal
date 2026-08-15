@@ -1,13 +1,11 @@
 from rest_framework import serializers
+
 from core.models import PaymentTransaction
 
 
 class PaymentHistorySerializer(serializers.ModelSerializer):
 
-    plan = serializers.CharField(
-        source="subscription.plan.name",
-        read_only=True
-    )
+    plan = serializers.CharField(source="subscription.plan.name", read_only=True)
 
     class Meta:
         model = PaymentTransaction

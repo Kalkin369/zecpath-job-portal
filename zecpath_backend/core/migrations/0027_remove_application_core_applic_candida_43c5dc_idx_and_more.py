@@ -6,70 +6,95 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0026_alter_paymenttransaction_status'),
+        ("core", "0026_alter_paymenttransaction_status"),
     ]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='application',
-            name='core_applic_candida_43c5dc_idx',
+            model_name="application",
+            name="core_applic_candida_43c5dc_idx",
         ),
         migrations.RemoveIndex(
-            model_name='application',
-            name='core_applic_job_id_0e9ae8_idx',
+            model_name="application",
+            name="core_applic_job_id_0e9ae8_idx",
         ),
         migrations.AlterField(
-            model_name='application',
-            name='applied_at',
+            model_name="application",
+            name="applied_at",
             field=models.DateTimeField(auto_now_add=True, db_index=True),
         ),
         migrations.AlterField(
-            model_name='candidate',
-            name='experience',
+            model_name="candidate",
+            name="experience",
             field=models.IntegerField(db_index=True, default=0),
         ),
         migrations.AlterField(
-            model_name='job',
-            name='created_at',
+            model_name="job",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, db_index=True),
         ),
         migrations.AlterField(
-            model_name='job',
-            name='status',
-            field=models.CharField(choices=[('active', 'Active'), ('inactive', 'Inactive')], default='active', max_length=10),
+            model_name="job",
+            name="status",
+            field=models.CharField(
+                choices=[("active", "Active"), ("inactive", "Inactive")],
+                default="active",
+                max_length=10,
+            ),
         ),
         migrations.AlterField(
-            model_name='paymenttransaction',
-            name='gateway_order_id',
+            model_name="paymenttransaction",
+            name="gateway_order_id",
             field=models.CharField(blank=True, db_index=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='paymenttransaction',
-            name='gateway_payment_id',
+            model_name="paymenttransaction",
+            name="gateway_payment_id",
             field=models.CharField(blank=True, db_index=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='paymenttransaction',
-            name='status',
-            field=models.CharField(choices=[('pending', 'Pending'), ('success', 'Success'), ('failed', 'Failed'), ('refund_pending', 'Refund Pending'), ('refunded', 'Refunded')], db_index=True, default='pending', max_length=20),
+            model_name="paymenttransaction",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("pending", "Pending"),
+                    ("success", "Success"),
+                    ("failed", "Failed"),
+                    ("refund_pending", "Refund Pending"),
+                    ("refunded", "Refunded"),
+                ],
+                db_index=True,
+                default="pending",
+                max_length=20,
+            ),
         ),
         migrations.AlterField(
-            model_name='subscriptionplan',
-            name='name',
+            model_name="subscriptionplan",
+            name="name",
             field=models.CharField(db_index=True, max_length=100),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='role',
-            field=models.CharField(choices=[('candidate', 'Candidate'), ('employer', 'Employer'), ('admin', 'Admin')], db_index=True, max_length=20),
+            model_name="user",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("candidate", "Candidate"),
+                    ("employer", "Employer"),
+                    ("admin", "Admin"),
+                ],
+                db_index=True,
+                max_length=20,
+            ),
         ),
         migrations.AlterField(
-            model_name='usersubscription',
-            name='is_active',
+            model_name="usersubscription",
+            name="is_active",
             field=models.BooleanField(db_index=True, default=True),
         ),
         migrations.AddIndex(
-            model_name='job',
-            index=models.Index(fields=['status', '-created_at'], name='core_job_status_fa2791_idx'),
+            model_name="job",
+            index=models.Index(
+                fields=["status", "-created_at"], name="core_job_status_fa2791_idx"
+            ),
         ),
     ]

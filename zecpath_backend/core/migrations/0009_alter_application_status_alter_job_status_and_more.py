@@ -6,23 +6,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0008_notificationlog'),
+        ("core", "0008_notificationlog"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='application',
-            name='status',
-            field=models.CharField(choices=[('applied', 'Applied'), ('shortlisted', 'Shortlisted'), ('interview', 'Interview Sheduled'), ('rejected', 'Rejected'), ('selected', 'Selected')], db_index=True, default='applied', max_length=20),
+            model_name="application",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("applied", "Applied"),
+                    ("shortlisted", "Shortlisted"),
+                    ("interview", "Interview Sheduled"),
+                    ("rejected", "Rejected"),
+                    ("selected", "Selected"),
+                ],
+                db_index=True,
+                default="applied",
+                max_length=20,
+            ),
         ),
         migrations.AlterField(
-            model_name='job',
-            name='status',
-            field=models.CharField(choices=[('active', 'Active'), ('inactive', 'Inactive')], db_index=True, default='active', max_length=10),
+            model_name="job",
+            name="status",
+            field=models.CharField(
+                choices=[("active", "Active"), ("inactive", "Inactive")],
+                db_index=True,
+                default="active",
+                max_length=10,
+            ),
         ),
         migrations.AlterField(
-            model_name='job',
-            name='title',
+            model_name="job",
+            name="title",
             field=models.CharField(db_index=True, max_length=255),
         ),
     ]

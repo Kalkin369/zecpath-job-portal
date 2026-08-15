@@ -7,14 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0021_alter_job_qualification'),
+        ("core", "0021_alter_job_qualification"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='availabilityslot',
-            name='employer',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='availability_slots', to='core.employer'),
+            model_name="availabilityslot",
+            name="employer",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="availability_slots",
+                to="core.employer",
+            ),
             preserve_default=False,
         ),
     ]

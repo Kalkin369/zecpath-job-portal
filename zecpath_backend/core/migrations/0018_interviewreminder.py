@@ -7,20 +7,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0017_availabilityslot_interviewschedule'),
+        ("core", "0017_availabilityslot_interviewschedule"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='InterviewReminder',
+            name="InterviewReminder",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('reminder_type', models.CharField(max_length=50)),
-                ('scheduled_for', models.DateTimeField()),
-                ('sent_at', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('sent', 'Sent'), ('failed', 'Failed')], default='pending', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('schedule', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reminders', to='core.interviewschedule')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("reminder_type", models.CharField(max_length=50)),
+                ("scheduled_for", models.DateTimeField()),
+                ("sent_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("sent", "Sent"),
+                            ("failed", "Failed"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "schedule",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reminders",
+                        to="core.interviewschedule",
+                    ),
+                ),
             ],
         ),
     ]

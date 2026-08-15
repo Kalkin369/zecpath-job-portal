@@ -1,12 +1,11 @@
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
 
-from core.models.notification_log import (
-    NotificationLog
-)
-from core.services.email_templates import (
-    application_status_template,payment_success_template,payment_failed_template,refund_processed_template
-)
+from core.models.notification_log import NotificationLog
+from core.services.email_templates import (application_status_template,
+                                           payment_failed_template,
+                                           payment_success_template,
+                                           refund_processed_template)
 
 
 def send_application_status_email(application):
@@ -28,16 +27,13 @@ def send_application_status_email(application):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [candidate.email],
-            fail_silently=False
+            fail_silently=False,
         )
 
         print("EMAIL SENT SUCCESS")
 
         NotificationLog.objects.create(
-            user=candidate,
-            subject=subject,
-            message=message,
-            status='success'
+            user=candidate, subject=subject, message=message, status="success"
         )
 
         print("LOG CREATED")
@@ -50,9 +46,10 @@ def send_application_status_email(application):
             user=candidate,
             subject=subject,
             message=message,
-            status='failed',
-            error_message=str(e)
+            status="failed",
+            error_message=str(e),
         )
+
 
 def send_payment_success_email(payment):
 
@@ -69,14 +66,11 @@ def send_payment_success_email(payment):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [employer.email],
-            fail_silently=False
+            fail_silently=False,
         )
 
         NotificationLog.objects.create(
-            user=employer,
-            subject=subject,
-            message=message,
-            status="success"
+            user=employer, subject=subject, message=message, status="success"
         )
 
     except Exception as e:
@@ -86,8 +80,9 @@ def send_payment_success_email(payment):
             subject=subject,
             message=message,
             status="failed",
-            error_message=str(e)
+            error_message=str(e),
         )
+
 
 def send_payment_failed_email(payment):
 
@@ -104,14 +99,11 @@ def send_payment_failed_email(payment):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [employer.email],
-            fail_silently=False
+            fail_silently=False,
         )
 
         NotificationLog.objects.create(
-            user=employer,
-            subject=subject,
-            message=message,
-            status="success"
+            user=employer, subject=subject, message=message, status="success"
         )
 
     except Exception as e:
@@ -121,7 +113,7 @@ def send_payment_failed_email(payment):
             subject=subject,
             message=message,
             status="failed",
-            error_message=str(e)
+            error_message=str(e),
         )
 
 
@@ -140,14 +132,11 @@ def send_refund_processed_email(payment):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [employer.email],
-            fail_silently=False
+            fail_silently=False,
         )
 
         NotificationLog.objects.create(
-            user=employer,
-            subject=subject,
-            message=message,
-            status="success"
+            user=employer, subject=subject, message=message, status="success"
         )
 
     except Exception as e:
@@ -157,5 +146,5 @@ def send_refund_processed_email(payment):
             subject=subject,
             message=message,
             status="failed",
-            error_message=str(e)
+            error_message=str(e),
         )

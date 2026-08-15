@@ -1,5 +1,6 @@
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.contrib.auth.models import AbstractUser,BaseUserManager
+
 
 class UserManager(BaseUserManager):
 
@@ -14,31 +15,31 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('role', 'admin')  # optional
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("role", "admin")  # optional
 
         return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('candidate','Candidate'),
-        ('employer','Employer'),
-        ('admin','Admin')
+        ("candidate", "Candidate"),
+        ("employer", "Employer"),
+        ("admin", "Admin"),
     )
 
     username = None
-    full_name = models.CharField(max_length=100,null=True,blank=True)
+    full_name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15,blank=True,null=True)
-    role = models.CharField(max_length=20,choices=ROLE_CHOICES,db_index=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, db_index=True)
     is_verified = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
-    created_at=models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = UserManager()
 

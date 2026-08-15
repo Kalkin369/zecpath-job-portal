@@ -12,3 +12,4 @@ class PaymentTestView(TemplateView):
         context["razorpay_key_id"] = settings.RAZORPAY_KEY_ID
 
         return context
+

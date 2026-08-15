@@ -1,17 +1,18 @@
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema
+)
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rest_framework.response import Response
-
-from core.permissions import IsEmployer,HasActiveSubscription
-
-from core.services.subscription_service import (SubscriptionService)
-
-from core.serializers.subscription_access_serializer import (SubscriptionAccessSerializer)
-
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiResponse,
+from core.permissions import (
+    HasActiveSubscription,
+    IsEmployer
 )
+from core.serializers.subscription_access_serializer import \
+    SubscriptionAccessSerializer
+from core.services.subscription_service import SubscriptionService
+
 
 @extend_schema(
     tags=["Subscription Access"],
@@ -24,7 +25,6 @@ from drf_spectacular.utils import (
         ),
     },
 )
-
 class SubscriptionAccessAPIView(APIView):
 
     permission_classes = [

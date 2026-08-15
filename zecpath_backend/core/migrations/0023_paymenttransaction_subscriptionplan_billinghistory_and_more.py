@@ -7,57 +7,124 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0022_availabilityslot_employer'),
+        ("core", "0022_availabilityslot_employer"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PaymentTransaction',
+            name="PaymentTransaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('transaction_id', models.CharField(max_length=100)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('success', 'Success'), ('failed', 'Failed')], default='pending', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("transaction_id", models.CharField(max_length=100)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("success", "Success"),
+                            ("failed", "Failed"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='SubscriptionPlan',
+            name="SubscriptionPlan",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('duration_days', models.IntegerField()),
-                ('max_job_posts', models.IntegerField()),
-                ('ai_enabled', models.BooleanField(default=False)),
-                ('analytics_enabled', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("duration_days", models.IntegerField()),
+                ("max_job_posts", models.IntegerField()),
+                ("ai_enabled", models.BooleanField(default=False)),
+                ("analytics_enabled", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='BillingHistory',
+            name="BillingHistory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('invoice_number', models.CharField(max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('employer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.employer')),
-                ('payment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.paymenttransaction')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("invoice_number", models.CharField(max_length=100)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "employer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.employer"
+                    ),
+                ),
+                (
+                    "payment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.paymenttransaction",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UserSubscription',
+            name="UserSubscription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('is_active', models.BooleanField(default=True)),
-                ('employer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.employer')),
-                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.subscriptionplan')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "employer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.employer"
+                    ),
+                ),
+                (
+                    "plan",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.subscriptionplan",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='paymenttransaction',
-            name='subscription',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.usersubscription'),
+            model_name="paymenttransaction",
+            name="subscription",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.usersubscription"
+            ),
         ),
     ]

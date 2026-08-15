@@ -9,10 +9,7 @@ class PaymentFailureSerializer(serializers.Serializer):
 
     plan = serializers.CharField()
 
-    amount = serializers.DecimalField(
-        max_digits=12,
-        decimal_places=2
-    )
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
 
     gateway = serializers.CharField()
 

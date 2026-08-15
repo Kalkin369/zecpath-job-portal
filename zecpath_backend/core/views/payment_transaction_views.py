@@ -1,21 +1,22 @@
-from core.models import PaymentTransaction
-
-from core.permissions import IsAdmin,IsEmployer
-
-from core.serializers.payment_transaction_serializer import (
-    PaymentTransactionSerializer
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
-
-from core.views.base_viewset import BaseViewSet
-
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema,extend_schema_view,OpenApiResponse
 
-@extend_schema(
-    tags=["Payment Transactions"]
+from core.models import PaymentTransaction
+from core.permissions import (
+    IsAdmin,
+    IsEmployer
 )
+from core.serializers.payment_transaction_serializer import \
+    PaymentTransactionSerializer
+from core.views.base_viewset import BaseViewSet
 
+
+@extend_schema(tags=["Payment Transactions"])
 @extend_schema_view(
     list=extend_schema(
         summary="Get Payment Transactions",
@@ -45,24 +46,14 @@ from drf_spectacular.utils import extend_schema,extend_schema_view,OpenApiRespon
     ),
     destroy=extend_schema(
         summary="Delete Payment Transaction",
-        responses={
-            204: OpenApiResponse(
-                description="Deleted successfully."
-            )
-        },
+        responses={204: OpenApiResponse(description="Deleted successfully.")},
     ),
 )
-
-
 class PaymentTransactionViewSet(BaseViewSet):
 
-    queryset = (
-        PaymentTransaction.objects.select_related(
-            "subscription"
-        )
-    )
+    queryset = PaymentTransaction.objects.select_related("subscription")
 
-    serializer_class = (PaymentTransactionSerializer)
+    serializer_class = PaymentTransactionSerializer
 
     permission_classes = [IsAdmin]
 
@@ -74,34 +65,25 @@ class PaymentTransactionViewSet(BaseViewSet):
             permission_classes = [IsAdmin]
 
         return [permission() for permission in permission_classes]
-    
-    @extend_schema(
-    summary="My Transactions",
-    description="Retrieve payment transactions for the authenticated employer.",
-    responses={
-        200: PaymentTransactionSerializer(many=True),
-    },
-    )
-    
 
+    @extend_schema(
+        summary="My Transactions",
+        description="Retrieve payment transactions for the authenticated employer.",
+        responses={
+            200: PaymentTransactionSerializer(many=True),
+        },
+    )
     @action(detail=False, methods=["get"])
     def my_transactions(self, request):
 
         transactions = (
-            PaymentTransaction.objects
-            .select_related(
-                "subscription",
-                "subscription__employer"
+            PaymentTransaction.objects.select_related(
+                "subscription", "subscription__employer"
             )
-            .filter(
-                subscription__employer=request.user.employer
-            )
+            .filter(subscription__employer=request.user.employer)
             .order_by("-created_at")
         )
 
-        serializer = self.get_serializer(
-            transactions,
-            many=True
-        )
+        serializer = self.get_serializer(transactions, many=True)
 
         return Response(serializer.data)

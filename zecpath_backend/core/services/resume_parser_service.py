@@ -1,16 +1,10 @@
 import os
 import re
 
-from PyPDF2 import PdfReader
 from docx import Document
+from PyPDF2 import PdfReader
 
-
-SUPPORTED_EXTENSIONS = [
-    ".pdf",
-    ".docx",
-    ".doc",
-    ".txt"
-]
+SUPPORTED_EXTENSIONS = [".pdf", ".docx", ".doc", ".txt"]
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
@@ -37,18 +31,12 @@ def extract_resume_text(file):
 
         doc = Document(file)
 
-        text = "\n".join(
-            para.text
-            for para in doc.paragraphs
-        )
+        text = "\n".join(para.text for para in doc.paragraphs)
 
     # DOC / TXT
     elif ext in [".doc", ".txt"]:
 
-        text = file.read().decode(
-            "utf-8",
-            errors="ignore"
-        )
+        text = file.read().decode("utf-8", errors="ignore")
 
     return clean_resume_text(text)
 
@@ -59,15 +47,11 @@ def validate_resume_file(file):
 
     if ext not in SUPPORTED_EXTENSIONS:
 
-        raise ValueError(
-            "Unsupported file format. Upload PDF, DOC, DOCX or TXT."
-        )
+        raise ValueError("Unsupported file format. Upload PDF, DOC, DOCX or TXT.")
 
     if file.size > MAX_FILE_SIZE:
 
-        raise ValueError(
-            "Resume file size should not exceed 5 MB."
-        )
+        raise ValueError("Resume file size should not exceed 5 MB.")
 
 
 def clean_resume_text(text):
@@ -76,17 +60,9 @@ def clean_resume_text(text):
     text = text.lower()
 
     # Remove extra whitespace
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    )
+    text = re.sub(r"\s+", " ", text)
 
     # Remove unwanted special characters
-    text = re.sub(
-        r"[^a-zA-Z0-9\s+#.-]",
-        "",
-        text
-    )
+    text = re.sub(r"[^a-zA-Z0-9\s+#.-]", "", text)
 
     return text.strip()

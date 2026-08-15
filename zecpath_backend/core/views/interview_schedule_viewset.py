@@ -1,20 +1,17 @@
-from core.permissions import (IsEmployer)
-
-from core.models import (InterviewSchedule)
-
-from core.serializers.interview_schedule_serializer import (InterviewScheduleSerializer)
-
-from core.views.base_viewset import (BaseViewSet)
-
 from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
     OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
 
-@extend_schema(
-    tags=["Interview Scheduling"]
-)
+from core.models import InterviewSchedule
+from core.permissions import IsEmployer
+from core.serializers.interview_schedule_serializer import \
+    InterviewScheduleSerializer
+from core.views.base_viewset import BaseViewSet
+
+
+@extend_schema(tags=["Interview Scheduling"])
 @extend_schema_view(
     list=extend_schema(
         summary="List Interview Schedules",
@@ -23,7 +20,6 @@ from drf_spectacular.utils import (
             200: InterviewScheduleSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve Interview Schedule",
         description="Retrieve an interview schedule.",
@@ -32,7 +28,6 @@ from drf_spectacular.utils import (
             404: OpenApiResponse(description="Interview schedule not found."),
         },
     ),
-
     create=extend_schema(
         summary="Create Interview Schedule",
         description="Create a new interview schedule.",
@@ -41,7 +36,6 @@ from drf_spectacular.utils import (
             201: InterviewScheduleSerializer,
         },
     ),
-
     update=extend_schema(
         summary="Update Interview Schedule",
         request=InterviewScheduleSerializer,
@@ -49,7 +43,6 @@ from drf_spectacular.utils import (
             200: InterviewScheduleSerializer,
         },
     ),
-
     partial_update=extend_schema(
         summary="Partially Update Interview Schedule",
         request=InterviewScheduleSerializer,
@@ -57,7 +50,6 @@ from drf_spectacular.utils import (
             200: InterviewScheduleSerializer,
         },
     ),
-
     destroy=extend_schema(
         summary="Delete Interview Schedule",
         responses={
@@ -65,10 +57,9 @@ from drf_spectacular.utils import (
         },
     ),
 )
-
 class InterviewScheduleViewSet(BaseViewSet):
 
-    serializer_class = (InterviewScheduleSerializer)
+    serializer_class = InterviewScheduleSerializer
 
     permission_classes = [IsEmployer]
 
@@ -77,8 +68,6 @@ class InterviewScheduleViewSet(BaseViewSet):
         if getattr(self, "swagger_fake_view", False):
             return InterviewSchedule.objects.none()
 
-        return (
-            InterviewSchedule.objects.filter(
-                application__job__employer=self.request.user.employer
-            )
+        return InterviewSchedule.objects.filter(
+            application__job__employer=self.request.user.employer
         )

@@ -1,11 +1,11 @@
 from django.db import models
 
-from core.models.ai_answer import (AIAnswer)
+from .ai_answer import AIAnswer
 
 
 class AnswerEvaluation(models.Model):
 
-    answer = models.OneToOneField(AIAnswer,on_delete=models.CASCADE)
+    answer = models.OneToOneField(AIAnswer, on_delete=models.CASCADE)
 
     relevance_score = models.FloatField(default=0)
 
@@ -18,4 +18,4 @@ class AnswerEvaluation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (f"Evaluation - {self.answer.id}")
+        return f"Evaluation - {self.answer.id}"

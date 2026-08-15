@@ -1,26 +1,18 @@
-from core.models import (AuditTrail)
-
-from core.serializers.audit_trail_serializer import (AuditTrailSerializer)
-
-from core.permissions import IsAdmin
-
-
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view
+)
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
-from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
-    OpenApiResponse,
-)
+from core.models import AuditTrail
+from core.permissions import IsAdmin
+from core.serializers.audit_trail_serializer import AuditTrailSerializer
 
 
-@extend_schema(
-    tags=["Audit Logs"]
-)
-
+@extend_schema(tags=["Audit Logs"])
 @extend_schema_view(
-
     list=extend_schema(
         summary="List Audit Logs",
         description="Retrieve system audit trail records.",
@@ -28,32 +20,22 @@ from drf_spectacular.utils import (
             200: AuditTrailSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve Audit Log",
         description="Retrieve an audit log by ID.",
         responses={
             200: AuditTrailSerializer,
-            404: OpenApiResponse(
-                description="Audit log not found."
-            ),
+            404: OpenApiResponse(description="Audit log not found."),
         },
     ),
 )
-
 class AuditTrailViewSet(
-
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     GenericViewSet,
-
 ):
 
-    queryset = (
-        AuditTrail.objects
-        .select_related("user")
-        .order_by("-created_at")
-    )
+    queryset = AuditTrail.objects.select_related("user").order_by("-created_at")
 
     serializer_class = AuditTrailSerializer
 

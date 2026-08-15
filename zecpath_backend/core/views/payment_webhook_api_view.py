@@ -1,15 +1,15 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema
+)
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from core.serializers.payment_webhook_serializer import (
+from core.serializers.payment_webhook_serializer import \
     PaymentWebhookSerializer
-)
+from core.services.payment_gateway_service import PaymentGatewayService
 
-from core.services.payment_gateway_service import (
-    PaymentGatewayService
-)
-from drf_spectacular.utils import extend_schema,OpenApiResponse
 
 @extend_schema(
     tags=["Payment Gateway"],
@@ -17,15 +17,10 @@ from drf_spectacular.utils import extend_schema,OpenApiResponse
     description="Webhook endpoint called by Razorpay for payment events.",
     request=PaymentWebhookSerializer,
     responses={
-        200: OpenApiResponse(
-            description="Webhook processed successfully."
-        ),
-        400: OpenApiResponse(
-            description="Invalid webhook signature."
-        ),
+        200: OpenApiResponse(description="Webhook processed successfully."),
+        400: OpenApiResponse(description="Invalid webhook signature."),
     },
 )
-
 class PaymentWebhookAPIView(APIView):
 
     authentication_classes = []
@@ -34,23 +29,14 @@ class PaymentWebhookAPIView(APIView):
     def post(self, request):
 
         serializer = PaymentWebhookSerializer(
-            data={
-                "signature": request.headers.get(
-                    "X-Razorpay-Signature"
-                )
-            }
+            data={"signature": request.headers.get("X-Razorpay-Signature")}
         )
 
-        serializer.is_valid(
-            raise_exception=True
-        )
+        serializer.is_valid(raise_exception=True)
 
         result = PaymentGatewayService().process_webhook(
-            payload=request.body,   # Raw payload
-            signature=serializer.validated_data["signature"]
+            payload=request.body,  # Raw payload
+            signature=serializer.validated_data["signature"],
         )
 
-        return Response(
-            result,
-            status=status.HTTP_200_OK
-        )
+        return Response(result, status=status.HTTP_200_OK)

@@ -1,22 +1,19 @@
+from django.core.cache import cache
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema
+)
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from rest_framework.response import Response
-
-from core.permissions import IsEmployerOrAdmin,CanUseAnalytics
-
-from core.services.recruiter_analytics_service import (RecruiterAnalyticsService)
-
-from django.core.cache import cache
-
-
+from core.permissions import (
+    CanUseAnalytics,
+    IsEmployerOrAdmin
+)
+from core.services.recruiter_analytics_service import RecruiterAnalyticsService
 from core.utils.error_handler import handle_exception
 
-
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiResponse,
-    OpenApiExample,
-)
 
 @extend_schema(
     tags=["Recruiter Analytics"],
@@ -26,15 +23,11 @@ from drf_spectacular.utils import (
         "conversion funnel, hiring performance, and time-based metrics."
     ),
     responses={
-        200: OpenApiResponse(
-            description="Analytics retrieved successfully."
-        ),
+        200: OpenApiResponse(description="Analytics retrieved successfully."),
         403: OpenApiResponse(
             description="Employer with analytics subscription required."
         ),
-        500: OpenApiResponse(
-            description="Unable to load analytics."
-        ),
+        500: OpenApiResponse(description="Unable to load analytics."),
     },
     examples=[
         OpenApiExample(
@@ -44,72 +37,45 @@ from drf_spectacular.utils import (
                 "funnel": {},
                 "conversion": {},
                 "job_performance": {},
-                "time_stats": {}
+                "time_stats": {},
             },
             response_only=True,
         )
     ],
 )
-
 class RecruiterAnalyticsAPIView(APIView):
 
-    permission_classes = [IsEmployerOrAdmin,CanUseAnalytics]
+    permission_classes = [IsEmployerOrAdmin, CanUseAnalytics]
 
-    def get(self,request):
-      
-      try:    
+    def get(self, request):
 
-        cache_key = (f"analytics_{request.user.id}")
+        try:
 
-        analytics_data = cache.get(cache_key)
+            cache_key = f"analytics_{request.user.id}"
 
-        if analytics_data:
+            analytics_data = cache.get(cache_key)
 
-            return Response(
-                analytics_data
+            if analytics_data:
+
+                return Response(analytics_data)
+
+            service = RecruiterAnalyticsService()
+
+            applications = service.get_applications(request.user)
+
+            analytics_data = {
+                "total_applications": applications.count(),
+                "funnel": service.get_funnel_metrics(request.user),
+                "conversion": service.get_conversion_rates(request.user),
+                "job_performance": service.get_job_performance(request.user),
+                "time_stats": service.get_time_based_stats(request.user),
+            }
+
+            cache.set(cache_key, analytics_data, timeout=300)
+
+            return Response(analytics_data)
+        except Exception as e:
+
+            return handle_exception(
+                "RecruiterAnalyticsAPIView", e, "Unable to load analytics"
             )
-
-        service = RecruiterAnalyticsService()
-
-        applications = (service.get_applications(request.user))
-
-        analytics_data = {
-
-            "total_applications":
-            applications.count(),
-
-            "funnel":
-            service.get_funnel_metrics(
-                request.user
-            ),
-
-            "conversion":
-            service.get_conversion_rates(
-                request.user
-            ),
-
-            "job_performance":
-            service.get_job_performance(
-                request.user
-            ),
-
-            "time_stats":
-            service.get_time_based_stats(
-                request.user
-            )
-        }
-
-        cache.set(
-            cache_key,
-            analytics_data,
-            timeout=300
-        )
-
-        return Response(
-            analytics_data
-        )
-      except Exception as e:
-
-        return handle_exception(
-           "RecruiterAnalyticsAPIView",e,"Unable to load analytics"
-        )

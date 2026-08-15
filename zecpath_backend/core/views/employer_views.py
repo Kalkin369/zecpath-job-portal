@@ -1,20 +1,20 @@
-from core.views.base_viewset import BaseViewSet
-from core.models.employer import Employer
-from core.serializers.employer_serializer import EmployerSerializer
-from core.permissions import IsEmployer
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter,OrderingFilter
-
 from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
     OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
+from rest_framework.filters import (
+    OrderingFilter,
+    SearchFilter
+)
+from core.models.employer import Employer
+from core.permissions import IsEmployer
+from core.serializers.employer_serializer import EmployerSerializer
+from core.views.base_viewset import BaseViewSet
 
 
-@extend_schema(
-    tags=["Employers"]
-)
+@extend_schema(tags=["Employers"])
 @extend_schema_view(
     list=extend_schema(
         summary="List Employers",
@@ -23,7 +23,6 @@ from drf_spectacular.utils import (
             200: EmployerSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve Employer",
         description="Retrieve an employer profile.",
@@ -32,7 +31,6 @@ from drf_spectacular.utils import (
             404: OpenApiResponse(description="Employer not found"),
         },
     ),
-
     create=extend_schema(
         summary="Create Employer Profile",
         description="Create an employer profile for the authenticated user.",
@@ -42,7 +40,6 @@ from drf_spectacular.utils import (
             400: OpenApiResponse(description="Validation error"),
         },
     ),
-
     update=extend_schema(
         summary="Update Employer Profile",
         description="Update an employer profile.",
@@ -51,7 +48,6 @@ from drf_spectacular.utils import (
             200: EmployerSerializer,
         },
     ),
-
     partial_update=extend_schema(
         summary="Partially Update Employer Profile",
         description="Update selected employer profile fields.",
@@ -60,7 +56,6 @@ from drf_spectacular.utils import (
             200: EmployerSerializer,
         },
     ),
-
     destroy=extend_schema(
         summary="Delete Employer Profile",
         description="Delete an employer profile.",
@@ -69,19 +64,16 @@ from drf_spectacular.utils import (
         },
     ),
 )
-
-
 class EmployerViewSet(BaseViewSet):
     queryset = Employer.objects.all()
     serializer_class = EmployerSerializer
     permission_classes = [IsEmployer]
-    filter_backends =[DjangoFilterBackend,SearchFilter,OrderingFilter]
-    search_fields = ['company_name']
-    ordering_fields = ['id','user_email']
-
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["company_name"]
+    ordering_fields = ["id", "user_email"]
 
     def get_queryset(self):
-        return (Employer.objects.select_related("user").filter(user=self.request.user))
-    
+        return Employer.objects.select_related("user").filter(user=self.request.user)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

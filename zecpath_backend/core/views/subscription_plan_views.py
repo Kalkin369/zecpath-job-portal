@@ -1,23 +1,16 @@
-from core.models import SubscriptionPlan
-
-from core.permissions import IsAdmin
-
-from core.serializers.subscription_plan_serializer import (
-    SubscriptionPlanSerializer
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
-
+from core.models import SubscriptionPlan
+from core.permissions import IsAdmin
+from core.serializers.subscription_plan_serializer import \
+    SubscriptionPlanSerializer
 from core.views.base_viewset import BaseViewSet
 
-from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
-    OpenApiResponse,
-)
 
-
-@extend_schema(
-    tags=["Subscription Plans"]
-)
+@extend_schema(tags=["Subscription Plans"])
 @extend_schema_view(
     list=extend_schema(
         summary="Get Subscription Plans",
@@ -61,12 +54,10 @@ from drf_spectacular.utils import (
         },
     ),
 )
-
-
 class SubscriptionPlanViewSet(BaseViewSet):
 
-    queryset = (SubscriptionPlan.objects.all())
+    queryset = SubscriptionPlan.objects.all()
 
-    serializer_class = (SubscriptionPlanSerializer)
+    serializer_class = SubscriptionPlanSerializer
 
     permission_classes = [IsAdmin]

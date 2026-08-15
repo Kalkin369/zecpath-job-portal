@@ -2,7 +2,9 @@ from django.db import models
 
 
 class AvailabilitySlot(models.Model):
-    employer = models.ForeignKey("Employer",on_delete=models.CASCADE,related_name="availability_slots")
+    employer = models.ForeignKey(
+        "Employer", on_delete=models.CASCADE, related_name="availability_slots"
+    )
 
     role = models.CharField(max_length=100)
 

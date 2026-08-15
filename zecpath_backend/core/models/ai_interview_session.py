@@ -1,29 +1,16 @@
 from django.db import models
-from core.models.ai_call import AICall
+
+from .ai_call import AICall
 
 
 class AIInterviewSession(models.Model):
 
-    ai_call = models.OneToOneField(
-        AICall,
-        on_delete=models.CASCADE
-    )
+    ai_call = models.OneToOneField(AICall, on_delete=models.CASCADE)
 
-    started_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    started_at = models.DateTimeField(auto_now_add=True)
 
-    ended_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    ended_at = models.DateTimeField(null=True, blank=True)
 
-    status = models.CharField(
-        max_length=20,
-        default='in_progress'
-    )
+    status = models.CharField(max_length=20, default="in_progress")
 
-    transcript = models.JSONField(
-        null=True,
-        blank=True
-    )
+    transcript = models.JSONField(null=True, blank=True)

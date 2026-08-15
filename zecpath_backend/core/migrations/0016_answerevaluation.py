@@ -7,20 +7,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0015_questiontemplate_expected_keywords_and_more'),
+        ("core", "0015_questiontemplate_expected_keywords_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AnswerEvaluation',
+            name="AnswerEvaluation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('relevance_score', models.FloatField(default=0)),
-                ('completeness_score', models.FloatField(default=0)),
-                ('keyword_score', models.FloatField(default=0)),
-                ('total_score', models.FloatField(default=0)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('answer', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='core.aianswer')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("relevance_score", models.FloatField(default=0)),
+                ("completeness_score", models.FloatField(default=0)),
+                ("keyword_score", models.FloatField(default=0)),
+                ("total_score", models.FloatField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "answer",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.aianswer"
+                    ),
+                ),
             ],
         ),
     ]

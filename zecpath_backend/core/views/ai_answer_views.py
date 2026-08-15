@@ -1,18 +1,16 @@
-from core.views.base_viewset import BaseViewSet
-from core.permissions import IsCandidate
-from core.throttles import InterviewThrottle
-from core.models.ai_answer import AIAnswer
-from core.serializers.ai_answer_serializer import AIAnswerSerializer
-
 from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
     OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
+from core.models.ai_answer import AIAnswer
+from core.permissions import IsCandidate
+from core.serializers.ai_answer_serializer import AIAnswerSerializer
+from core.throttles import InterviewThrottle
+from core.views.base_viewset import BaseViewSet
 
-@extend_schema(
-    tags=["AI Answers"]
-)
+
+@extend_schema(tags=["AI Answers"])
 @extend_schema_view(
     list=extend_schema(
         summary="List AI Answers",
@@ -21,7 +19,6 @@ from drf_spectacular.utils import (
             200: AIAnswerSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve AI Answer",
         description="Retrieve a candidate's interview answer.",
@@ -30,7 +27,6 @@ from drf_spectacular.utils import (
             404: OpenApiResponse(description="Answer not found."),
         },
     ),
-
     create=extend_schema(
         summary="Create AI Answer",
         description="Submit an AI interview answer.",
@@ -40,7 +36,6 @@ from drf_spectacular.utils import (
             400: OpenApiResponse(description="Validation error."),
         },
     ),
-
     update=extend_schema(
         summary="Update AI Answer",
         description="Update an AI interview answer.",
@@ -49,7 +44,6 @@ from drf_spectacular.utils import (
             200: AIAnswerSerializer,
         },
     ),
-
     partial_update=extend_schema(
         summary="Partially Update AI Answer",
         description="Update selected fields of an AI interview answer.",
@@ -58,7 +52,6 @@ from drf_spectacular.utils import (
             200: AIAnswerSerializer,
         },
     ),
-
     destroy=extend_schema(
         summary="Delete AI Answer",
         description="Delete an AI interview answer.",
@@ -67,8 +60,6 @@ from drf_spectacular.utils import (
         },
     ),
 )
-
-
 class AIAnswerViewSet(BaseViewSet):
 
     queryset = AIAnswer.objects.all()
@@ -81,15 +72,11 @@ class AIAnswerViewSet(BaseViewSet):
 
     def get_queryset(self):
 
-        return (
-            self.queryset
-            .select_related(
-                "question",
-                "question__session",
-                "question__session__ai_call",
-                "question__session__ai_call__application"
-            )
-            .filter(
-                question__session__ai_call__application__candidate=self.request.user.candidate
-            )
+        return self.queryset.select_related(
+            "question",
+            "question__session",
+            "question__session__ai_call",
+            "question__session__ai_call__application",
+        ).filter(
+            question__session__ai_call__application__candidate=self.request.user.candidate
         )

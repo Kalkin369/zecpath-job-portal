@@ -1,16 +1,12 @@
 from rest_framework import serializers
 
-from core.models import (
-    CandidateReport
-)
+from core.models import CandidateReport
 
 
-class CandidateReportSerializer(
-    serializers.ModelSerializer
-):
+class CandidateReportSerializer(serializers.ModelSerializer):
 
     class Meta:
 
         model = CandidateReport
 
-        fields = '__all__'
+        fields = "__all__"

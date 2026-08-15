@@ -1,14 +1,13 @@
-from rest_framework.views import APIView
-
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema
+)
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from core.permissions import IsAdmin
 
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiResponse,
-    OpenApiExample,
-)
 
 @extend_schema(
     tags=["Security"],
@@ -19,12 +18,8 @@ from drf_spectacular.utils import (
         "and security logging."
     ),
     responses={
-        200: OpenApiResponse(
-            description="Security report retrieved successfully."
-        ),
-        403: OpenApiResponse(
-            description="Admin authentication required."
-        ),
+        200: OpenApiResponse(description="Security report retrieved successfully."),
+        403: OpenApiResponse(description="Admin authentication required."),
     },
     examples=[
         OpenApiExample(
@@ -34,35 +29,24 @@ from drf_spectacular.utils import (
                 "throttling": "Enabled",
                 "encryption": "Passwords Hashed",
                 "audit_logs": "Enabled",
-                "security_logs": "Enabled"
+                "security_logs": "Enabled",
             },
             response_only=True,
         )
     ],
 )
-
-
 class SecurityReportAPIView(APIView):
 
     permission_classes = [IsAdmin]
 
-    def get(self,request):
+    def get(self, request):
 
         return Response(
             {
-                "authentication":
-                "JWT",
-
-                "throttling":
-                "Enabled",
-
-                "encryption":
-                "Passwords Hashed",
-
-                "audit_logs":
-                "Enabled",
-
-                "security_logs":
-                "Enabled"
+                "authentication": "JWT",
+                "throttling": "Enabled",
+                "encryption": "Passwords Hashed",
+                "audit_logs": "Enabled",
+                "security_logs": "Enabled",
             }
         )

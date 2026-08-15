@@ -1,12 +1,16 @@
-from rest_framework.views import APIView
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema
+)
 from rest_framework.response import Response
-from core.permissions import IsCandidate
+from rest_framework.views import APIView
 
-from core.services.resume_parser_service import (extract_resume_text)
-from core.services.resume_nlp_service import (build_resume_json)
-from core.services.logging_service import LoggingService
+from core.permissions import IsCandidate
+from core.services.resume_nlp_service import build_resume_json
+from core.services.resume_parser_service import extract_resume_text
 from core.utils.error_handler import handle_exception
-from drf_spectacular.utils import extend_schema,OpenApiExample,OpenApiResponse
+
 
 @extend_schema(
     tags=["Resume Parser"],
@@ -18,25 +22,14 @@ from drf_spectacular.utils import extend_schema,OpenApiExample,OpenApiResponse
     request={
         "multipart/form-data": {
             "type": "object",
-            "properties": {
-                "resume": {
-                    "type": "string",
-                    "format": "binary"
-                }
-            },
-            "required": ["resume"]
+            "properties": {"resume": {"type": "string", "format": "binary"}},
+            "required": ["resume"],
         }
     },
     responses={
-        200: OpenApiResponse(
-            description="Resume parsed successfully."
-        ),
-        400: OpenApiResponse(
-            description="Resume file is missing or parsing failed."
-        ),
-        403: OpenApiResponse(
-            description="Candidate authentication required."
-        ),
+        200: OpenApiResponse(description="Resume parsed successfully."),
+        400: OpenApiResponse(description="Resume file is missing or parsing failed."),
+        403: OpenApiResponse(description="Candidate authentication required."),
     },
     examples=[
         OpenApiExample(
@@ -47,54 +40,33 @@ from drf_spectacular.utils import extend_schema,OpenApiExample,OpenApiResponse
                     "name": "John Doe",
                     "email": "john@example.com",
                     "phone": "+91XXXXXXXXXX",
-                    "skills": [
-                        "Python",
-                        "Django",
-                        "REST API"
-                    ],
-                    "education": [
-                        {
-                            "degree": "B.Tech"
-                        }
-                    ],
-                    "experience": [
-                        {
-                            "company": "ABC Pvt Ltd",
-                            "years": 3
-                        }
-                    ]
-                }
+                    "skills": ["Python", "Django", "REST API"],
+                    "education": [{"degree": "B.Tech"}],
+                    "experience": [{"company": "ABC Pvt Ltd", "years": 3}],
+                },
             },
             response_only=True,
         )
     ],
 )
-
 class ResumeParserAPIView(APIView):
 
     permission_classes = [IsCandidate]
 
     def post(self, request):
 
-        file = request.FILES.get('resume')
+        file = request.FILES.get("resume")
 
         if not file:
-            return Response({
-                "error": "Resume file required"
-            }, status=400)
+            return Response({"error": "Resume file required"}, status=400)
 
-        try:    
+        try:
 
             text = extract_resume_text(file)
             structured_data = build_resume_json(text)
 
         except Exception as e:
 
-            return handle_exception(
-                "ResumeParserAPIView",e,"Unable to parse resume."
-            )
+            return handle_exception("ResumeParserAPIView", e, "Unable to parse resume.")
 
-        return Response({
-            "parsed_text": text,
-            "structured_data":structured_data
-        })
+        return Response({"parsed_text": text, "structured_data": structured_data})

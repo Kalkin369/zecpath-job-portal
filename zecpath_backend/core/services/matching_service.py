@@ -1,7 +1,4 @@
-def calculate_skill_score(
-    candidate_skills,
-    required_skills
-):
+def calculate_skill_score(candidate_skills, required_skills):
 
     matched_skills = []
 
@@ -13,10 +10,7 @@ def calculate_skill_score(
     if not required_skills:
         return 0, []
 
-    score = (
-        len(matched_skills)
-        / len(required_skills)
-    ) * 100
+    score = (len(matched_skills) / len(required_skills)) * 100
 
     return round(score, 2), matched_skills
 
@@ -30,10 +24,7 @@ def safe_int(value):
         return 0
 
 
-def calculate_experience_score(
-    candidate_exp,
-    required_exp
-):
+def calculate_experience_score(candidate_exp, required_exp):
 
     candidate_exp = safe_int(candidate_exp)
     required_exp = safe_int(required_exp)
@@ -44,17 +35,12 @@ def calculate_experience_score(
     if candidate_exp >= required_exp:
         return 100
 
-    score = (
-        candidate_exp / required_exp
-    ) * 100
+    score = (candidate_exp / required_exp) * 100
 
     return round(score, 2)
 
 
-def calculate_education_score(
-    candidate_education,
-    required_education
-):
+def calculate_education_score(candidate_education, required_education):
 
     if not candidate_education:
         return 50

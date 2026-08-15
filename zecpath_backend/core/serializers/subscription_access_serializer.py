@@ -23,10 +23,6 @@ class SubscriptionAccessSerializer(serializers.Serializer):
 
     candidate_access_remaining = serializers.IntegerField()
 
-    start_date = serializers.DateField(
-        allow_null=True
-    )
+    start_date = serializers.DateField(allow_null=True)
 
-    expires_on = serializers.DateField(
-        allow_null=True
-    )
+    expires_on = serializers.DateField(allow_null=True)

@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0020_errorlog_securitylog_audittrail'),
+        ("core", "0020_errorlog_securitylog_audittrail"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='job',
-            name='qualification',
-            field=models.CharField(default='Bachelor Degree', max_length=100),
+            model_name="job",
+            name="qualification",
+            field=models.CharField(default="Bachelor Degree", max_length=100),
             preserve_default=False,
         ),
     ]

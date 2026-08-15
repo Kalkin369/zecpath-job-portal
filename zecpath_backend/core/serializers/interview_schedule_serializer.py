@@ -1,16 +1,12 @@
 from rest_framework import serializers
 
-from core.models import (
-    InterviewSchedule
-)
+from core.models import InterviewSchedule
 
 
-class InterviewScheduleSerializer(
-    serializers.ModelSerializer
-):
+class InterviewScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
 
         model = InterviewSchedule
 
-        fields = '__all__'
+        fields = "__all__"

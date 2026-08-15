@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0024_paymenttransaction_captured_and_more'),
+        ("core", "0024_paymenttransaction_captured_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='subscriptionplan',
-            name='max_candidate_access',
+            model_name="subscriptionplan",
+            name="max_candidate_access",
             field=models.IntegerField(default=0),
         ),
     ]

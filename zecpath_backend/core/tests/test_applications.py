@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 
-from core.models.user import User
 from core.models.job import Job
+from core.models.user import User
 
 
 class ApplicationTests(APITestCase):
@@ -10,18 +10,14 @@ class ApplicationTests(APITestCase):
 
         # Employer
         self.employer_user = User.objects.create_user(
-            email="employer@test.com",
-            password="test1234",
-            role="employer"
+            email="employer@test.com", password="test1234", role="employer"
         )
 
         self.employer = self.employer_user.employer
 
         # Candidate
         self.candidate_user = User.objects.create_user(
-            email="candidate@test.com",
-            password="test1234",
-            role="candidate"
+            email="candidate@test.com", password="test1234", role="candidate"
         )
 
         self.candidate = self.candidate_user.candidate
@@ -34,35 +30,21 @@ class ApplicationTests(APITestCase):
             skills="python,django",
             experience=2,
             location="Kerala",
-            job_type="full_time"
+            job_type="full_time",
         )
 
     def test_candidate_can_view_own_applications(self):
 
-        self.client.force_authenticate(
-            user=self.candidate_user
-        )
+        self.client.force_authenticate(user=self.candidate_user)
 
-        response = self.client.get(
-            "/api/applications/"
-        )
+        response = self.client.get("/api/applications/")
 
-        self.assertEqual(
-            response.status_code,
-            200
-        )
+        self.assertEqual(response.status_code, 200)
 
     def test_employer_can_view_job_applicants(self):
 
-        self.client.force_authenticate(
-            user=self.employer_user
-        )
+        self.client.force_authenticate(user=self.employer_user)
 
-        response = self.client.get(
-            f"/api/applications/job/{self.job.id}/applicants/"
-        )
+        response = self.client.get(f"/api/applications/job/{self.job.id}/applicants/")
 
-        self.assertEqual(
-            response.status_code,
-            200
-        )
+        self.assertEqual(response.status_code, 200)

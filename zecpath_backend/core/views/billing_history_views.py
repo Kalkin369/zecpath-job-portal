@@ -1,12 +1,16 @@
-from core.models import BillingHistory
-
-from core.permissions import IsAdmin
-
-from core.serializers.billing_history_serializer import (BillingHistorySerializer)
-
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view
+)
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
-from drf_spectacular.utils import extend_schema,extend_schema_view,OpenApiResponse
+
+from core.models import BillingHistory
+from core.permissions import IsAdmin
+from core.serializers.billing_history_serializer import \
+    BillingHistorySerializer
+
 
 @extend_schema(tags=["Billing History"])
 @extend_schema_view(
@@ -22,27 +26,18 @@ from drf_spectacular.utils import extend_schema,extend_schema_view,OpenApiRespon
         description="Retrieve a billing history record by ID.",
         responses={
             200: BillingHistorySerializer,
-            404: OpenApiResponse(
-                description="Billing history not found."
-            ),
+            404: OpenApiResponse(description="Billing history not found."),
         },
     ),
 )
-
-
 class BillingHistoryViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
 
-    queryset = (
-        BillingHistory.objects.select_related(
-            "employer",
-            "payment"
-        )
-    )
+    queryset = BillingHistory.objects.select_related("employer", "payment")
 
-    serializer_class = (BillingHistorySerializer)
+    serializer_class = BillingHistorySerializer
 
     permission_classes = [IsAdmin]

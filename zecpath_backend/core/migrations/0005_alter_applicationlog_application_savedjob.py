@@ -7,25 +7,47 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0004_applicationlog'),
+        ("core", "0004_applicationlog"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='applicationlog',
-            name='application',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='logs', to='core.application'),
+            model_name="applicationlog",
+            name="application",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="logs",
+                to="core.application",
+            ),
         ),
         migrations.CreateModel(
-            name='SavedJob',
+            name="SavedJob",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('saved_at', models.DateTimeField(auto_now_add=True)),
-                ('candidate', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.candidate')),
-                ('job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.job')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("saved_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "candidate",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.candidate"
+                    ),
+                ),
+                (
+                    "job",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.job"
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('candidate', 'job')},
+                "unique_together": {("candidate", "job")},
             },
         ),
     ]

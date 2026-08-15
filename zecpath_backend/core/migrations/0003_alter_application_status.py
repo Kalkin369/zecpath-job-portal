@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0002_rename_created_at_application_applied_at_and_more'),
+        ("core", "0002_rename_created_at_application_applied_at_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='application',
-            name='status',
-            field=models.CharField(choices=[('applied', 'Applied'), ('shortlisted', 'Shortlisted'), ('interview', 'Interview Sheduled'), ('rejected', 'Rejected'), ('selected', 'Selected')], default='applied', max_length=20),
+            model_name="application",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("applied", "Applied"),
+                    ("shortlisted", "Shortlisted"),
+                    ("interview", "Interview Sheduled"),
+                    ("rejected", "Rejected"),
+                    ("selected", "Selected"),
+                ],
+                default="applied",
+                max_length=20,
+            ),
         ),
     ]

@@ -7,18 +7,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_alter_application_status'),
+        ("core", "0003_alter_application_status"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ApplicationLog',
+            name="ApplicationLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('old_status', models.CharField(max_length=20)),
-                ('new_status', models.CharField(max_length=20)),
-                ('changed_at', models.DateTimeField(auto_now_add=True)),
-                ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.application')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("old_status", models.CharField(max_length=20)),
+                ("new_status", models.CharField(max_length=20)),
+                ("changed_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "application",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.application",
+                    ),
+                ),
             ],
         ),
     ]

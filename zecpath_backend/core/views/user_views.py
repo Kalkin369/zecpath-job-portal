@@ -1,23 +1,22 @@
-from core.views.base_viewset import BaseViewSet
-from core.models.user import User
-from core.serializers.user_serializer import UserSerializer
-from rest_framework.permissions import IsAuthenticated
-from core.permissions import IsAdmin
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter,OrderingFilter
-
 from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
     OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
-
-@extend_schema(
-    tags=["Users"]
+from rest_framework.filters import (
+    OrderingFilter,
+    SearchFilter
 )
+from rest_framework.permissions import IsAuthenticated
+from core.models.user import User
+from core.permissions import IsAdmin
+from core.serializers.user_serializer import UserSerializer
+from core.views.base_viewset import BaseViewSet
 
+
+@extend_schema(tags=["Users"])
 @extend_schema_view(
-
     list=extend_schema(
         summary="List Users",
         description="Retrieve all registered users. Admin only.",
@@ -25,18 +24,14 @@ from drf_spectacular.utils import (
             200: UserSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve User",
         description="Retrieve a user by ID.",
         responses={
             200: UserSerializer,
-            404: OpenApiResponse(
-                description="User not found."
-            ),
+            404: OpenApiResponse(description="User not found."),
         },
     ),
-
     create=extend_schema(
         summary="Create User",
         description=(
@@ -46,12 +41,9 @@ from drf_spectacular.utils import (
         request=UserSerializer,
         responses={
             201: UserSerializer,
-            400: OpenApiResponse(
-                description="Validation error."
-            ),
+            400: OpenApiResponse(description="Validation error."),
         },
     ),
-
     update=extend_schema(
         summary="Update User",
         description="Update an existing user.",
@@ -60,7 +52,6 @@ from drf_spectacular.utils import (
             200: UserSerializer,
         },
     ),
-
     partial_update=extend_schema(
         summary="Partially Update User",
         description="Update selected user fields.",
@@ -69,19 +60,14 @@ from drf_spectacular.utils import (
             200: UserSerializer,
         },
     ),
-
     destroy=extend_schema(
         summary="Delete User",
         description="Delete a user.",
         responses={
-            204: OpenApiResponse(
-                description="User deleted successfully."
-            ),
+            204: OpenApiResponse(description="User deleted successfully."),
         },
     ),
-
 )
-
 class UserViewSet(BaseViewSet):
 
     queryset = User.objects.all()
@@ -99,9 +85,7 @@ class UserViewSet(BaseViewSet):
         OrderingFilter,
     ]
 
-    search_fields = [
-        "email"
-    ]
+    search_fields = ["email"]
 
     ordering_fields = [
         "id",

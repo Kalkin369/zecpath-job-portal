@@ -1,21 +1,16 @@
-
-from core.permissions import IsEmployer
-
-from core.models import (AvailabilitySlot)
-
-from core.serializers.availability_slot_serializer import (AvailabilitySlotSerializer)
-
-from core.views.base_viewset import (BaseViewSet)
-
 from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_view,
     OpenApiResponse,
+    extend_schema,
+    extend_schema_view
 )
+from core.models import AvailabilitySlot
+from core.permissions import IsEmployer
+from core.serializers.availability_slot_serializer import \
+    AvailabilitySlotSerializer
+from core.views.base_viewset import BaseViewSet
 
-@extend_schema(
-    tags=["Interview Scheduling"]
-)
+
+@extend_schema(tags=["Interview Scheduling"])
 @extend_schema_view(
     list=extend_schema(
         summary="List Availability Slots",
@@ -24,7 +19,6 @@ from drf_spectacular.utils import (
             200: AvailabilitySlotSerializer(many=True),
         },
     ),
-
     retrieve=extend_schema(
         summary="Retrieve Availability Slot",
         description="Retrieve an availability slot.",
@@ -33,7 +27,6 @@ from drf_spectacular.utils import (
             404: OpenApiResponse(description="Availability slot not found."),
         },
     ),
-
     create=extend_schema(
         summary="Create Availability Slot",
         description="Create a new interview availability slot.",
@@ -42,7 +35,6 @@ from drf_spectacular.utils import (
             201: AvailabilitySlotSerializer,
         },
     ),
-
     update=extend_schema(
         summary="Update Availability Slot",
         request=AvailabilitySlotSerializer,
@@ -50,7 +42,6 @@ from drf_spectacular.utils import (
             200: AvailabilitySlotSerializer,
         },
     ),
-
     partial_update=extend_schema(
         summary="Partially Update Availability Slot",
         request=AvailabilitySlotSerializer,
@@ -58,7 +49,6 @@ from drf_spectacular.utils import (
             200: AvailabilitySlotSerializer,
         },
     ),
-
     destroy=extend_schema(
         summary="Delete Availability Slot",
         responses={
@@ -66,8 +56,6 @@ from drf_spectacular.utils import (
         },
     ),
 )
-
-
 class AvailabilitySlotViewSet(BaseViewSet):
 
     serializer_class = AvailabilitySlotSerializer
@@ -79,11 +67,7 @@ class AvailabilitySlotViewSet(BaseViewSet):
         if getattr(self, "swagger_fake_view", False):
             return AvailabilitySlot.objects.none()
 
-        return (
-            AvailabilitySlot.objects.filter(
-                employer=self.request.user.employer
-            )
-        )
-    
-    def perform_create(self,serializer):
+        return AvailabilitySlot.objects.filter(employer=self.request.user.employer)
+
+    def perform_create(self, serializer):
         serializer.save(employer=self.request.user.employer)

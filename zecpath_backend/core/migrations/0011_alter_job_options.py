@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0010_alter_application_resume'),
+        ("core", "0010_alter_application_resume"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='job',
-            options={'ordering': ['-created_at']},
+            name="job",
+            options={"ordering": ["-created_at"]},
         ),
     ]

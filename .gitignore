@@ -5,3 +5,11 @@ db.sqlite3
 .env
 media/
 resumes/
+staticfiles/
+*.log
+
+flake8_report.txt
+flake8_report_after_black.txt
+flake8_final.txt
+pylint_report.txt
+pylint_final.txt
